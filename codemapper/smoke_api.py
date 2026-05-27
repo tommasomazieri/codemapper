@@ -56,7 +56,7 @@ if __name__ == "__main__":
     try:
         httpx.get(BASE + "/map", timeout=2)
         console.print(f"[dim]Server already running on {BASE}[/dim]")
-    except httpx.ConnectError:
+    except (httpx.ConnectError, httpx.ConnectTimeout):
         console.print(f"[yellow]Starting server on port {PORT}...[/yellow]")
         env = os.environ.copy()
         env["CODEMAPPER_ROOT"] = ROOT
@@ -72,7 +72,7 @@ if __name__ == "__main__":
             try:
                 httpx.get(BASE + "/map", timeout=1)
                 break
-            except httpx.ConnectError:
+            except (httpx.ConnectError, httpx.ConnectTimeout):
                 pass
         else:
             console.print(f"[bold red]Server failed to start on {BASE}[/bold red]")
