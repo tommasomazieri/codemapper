@@ -45,107 +45,108 @@ def post(path: str, data: dict | None = None, label: str | None = None) -> objec
 # Ping
 # ---------------------------------------------------------------------------
 
-try:
-    httpx.get(BASE + "/map", timeout=3)
-except httpx.ConnectError:
-    console.print("[bold red]Cannot reach server at http://localhost:8000[/bold red]")
-    console.print("Start it with:  [bold]uvicorn codemapper.api:app --reload[/bold]")
-    sys.exit(1)
+if __name__ == "__main__":
+    try:
+        httpx.get(BASE + "/map", timeout=3)
+    except httpx.ConnectError:
+        console.print("[bold red]Cannot reach server at http://localhost:8000[/bold red]")
+        console.print("Start it with:  [bold]uvicorn codemapper.api:app --reload[/bold]")
+        sys.exit(1)
 
-console.print(Panel(
-    "[bold green]codemapper API — endpoint test run[/bold green]\n"
-    f"Server: [cyan]{BASE}[/cyan]",
-    border_style="bright_blue",
-))
+    console.print(Panel(
+        "[bold green]codemapper API — endpoint test run[/bold green]\n"
+        f"Server: [cyan]{BASE}[/cyan]",
+        border_style="bright_blue",
+    ))
 
-# ---------------------------------------------------------------------------
-# /map
-# ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # /map
+    # ---------------------------------------------------------------------------
 
-section("/map  —  codebase overview")
-get("/map", {"level": 0}, "GET /map?level=0  (file tree + docstrings)")
-get("/map", {"level": 1}, "GET /map?level=1  (adds symbol names)")
-get("/map", {"level": 2}, "GET /map?level=2  (adds signatures)")
+    section("/map  —  codebase overview")
+    get("/map", {"level": 0}, "GET /map?level=0  (file tree + docstrings)")
+    get("/map", {"level": 1}, "GET /map?level=1  (adds symbol names)")
+    get("/map", {"level": 2}, "GET /map?level=2  (adds signatures)")
 
-# ---------------------------------------------------------------------------
-# /file/{path}
-# ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # /file/{path}
+    # ---------------------------------------------------------------------------
 
-section("/file/{path}  —  single file detail")
-get("/file/codemapper/parser.py", {"level": 0}, "GET /file/codemapper/parser.py?level=0")
-get("/file/codemapper/parser.py", {"level": 2}, "GET /file/codemapper/parser.py?level=2")
-get("/file/nonexistent.py", label="GET /file/nonexistent.py  (expect 404)")
+    section("/file/{path}  —  single file detail")
+    get("/file/codemapper/parser.py", {"level": 0}, "GET /file/codemapper/parser.py?level=0")
+    get("/file/codemapper/parser.py", {"level": 2}, "GET /file/codemapper/parser.py?level=2")
+    get("/file/nonexistent.py", label="GET /file/nonexistent.py  (expect 404)")
 
-# ---------------------------------------------------------------------------
-# /symbol, /usages, /imports, /search
-# ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # /symbol, /usages, /imports, /search
+    # ---------------------------------------------------------------------------
 
-section("/symbol/{name}  —  definition lookup")
-get("/symbol/ParsedFile", label="GET /symbol/ParsedFile")
-get("/symbol/CodeIndex",  label="GET /symbol/CodeIndex")
+    section("/symbol/{name}  —  definition lookup")
+    get("/symbol/ParsedFile", label="GET /symbol/ParsedFile")
+    get("/symbol/CodeIndex",  label="GET /symbol/CodeIndex")
 
-section("/usages/{name}  —  all usage sites")
-get("/usages/ParsedFile", label="GET /usages/ParsedFile")
+    section("/usages/{name}  —  all usage sites")
+    get("/usages/ParsedFile", label="GET /usages/ParsedFile")
 
-section("/imports/{module}  —  files that import a module")
-get("/imports/fastapi",    label="GET /imports/fastapi")
-get("/imports/dataclasses", label="GET /imports/dataclasses")
+    section("/imports/{module}  —  files that import a module")
+    get("/imports/fastapi",    label="GET /imports/fastapi")
+    get("/imports/dataclasses", label="GET /imports/dataclasses")
 
-section("/search  —  fuzzy symbol search")
-get("/search", {"q": "parse"}, "GET /search?q=parse")
-get("/search", {"q": "index"}, "GET /search?q=index")
+    section("/search  —  fuzzy symbol search")
+    get("/search", {"q": "parse"}, "GET /search?q=parse")
+    get("/search", {"q": "index"}, "GET /search?q=index")
 
-# ---------------------------------------------------------------------------
-# /packages
-# ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # /packages
+    # ---------------------------------------------------------------------------
 
-section("/packages  —  installed packages")
-get("/packages", label="GET /packages")
+    section("/packages  —  installed packages")
+    get("/packages", label="GET /packages")
 
-# ---------------------------------------------------------------------------
-# Sessions
-# ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # Sessions
+    # ---------------------------------------------------------------------------
 
-section("Sessions  —  progressive disclosure flow")
+    section("Sessions  —  progressive disclosure flow")
 
-result = post("/session/new", label="POST /session/new")
-sid = result.get("session_id", "UNKNOWN")
-console.print(f"  [dim]session_id:[/dim] [yellow]{sid}[/yellow]")
+    result = post("/session/new", label="POST /session/new")
+    sid = result.get("session_id", "UNKNOWN")
+    console.print(f"  [dim]session_id:[/dim] [yellow]{sid}[/yellow]")
 
-post(
-    f"/session/{sid}/expand",
-    {"path": "codemapper/parser.py", "level": 1},
-    f"POST /session/{sid[:8]}…/expand  path=parser.py level=1  (first call → full delta)",
-)
+    post(
+        f"/session/{sid}/expand",
+        {"path": "codemapper/parser.py", "level": 1},
+        f"POST /session/{sid[:8]}…/expand  path=parser.py level=1  (first call → full delta)",
+    )
 
-post(
-    f"/session/{sid}/expand",
-    {"path": "codemapper/parser.py", "level": 1},
-    f"POST /session/{sid[:8]}…/expand  path=parser.py level=1  (repeat → delta=null)",
-)
+    post(
+        f"/session/{sid}/expand",
+        {"path": "codemapper/parser.py", "level": 1},
+        f"POST /session/{sid[:8]}…/expand  path=parser.py level=1  (repeat → delta=null)",
+    )
 
-post(
-    f"/session/{sid}/expand",
-    {"path": "codemapper/parser.py", "level": 2},
-    f"POST /session/{sid[:8]}…/expand  path=parser.py level=2  (upgrade L1→L2 → sig delta)",
-)
+    post(
+        f"/session/{sid}/expand",
+        {"path": "codemapper/parser.py", "level": 2},
+        f"POST /session/{sid[:8]}…/expand  path=parser.py level=2  (upgrade L1→L2 → sig delta)",
+    )
 
-post(
-    f"/session/{sid}/expand",
-    {"path": "codemapper/index.py", "level": 1},
-    f"POST /session/{sid[:8]}…/expand  path=index.py level=1  (new file → full delta)",
-)
+    post(
+        f"/session/{sid}/expand",
+        {"path": "codemapper/index.py", "level": 1},
+        f"POST /session/{sid[:8]}…/expand  path=index.py level=1  (new file → full delta)",
+    )
 
-# ---------------------------------------------------------------------------
-# /refresh
-# ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # /refresh
+    # ---------------------------------------------------------------------------
 
-section("/refresh  —  re-index")
-post("/refresh", label="POST /refresh")
+    section("/refresh  —  re-index")
+    post("/refresh", label="POST /refresh")
 
-# ---------------------------------------------------------------------------
-# Done
-# ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # Done
+    # ---------------------------------------------------------------------------
 
-console.print()
-console.print(Panel("[bold green]All endpoints tested.[/bold green]", border_style="green"))
+    console.print()
+    console.print(Panel("[bold green]All endpoints tested.[/bold green]", border_style="green"))
