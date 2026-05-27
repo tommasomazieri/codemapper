@@ -35,3 +35,10 @@ def standalone_function(x: int, y: float = 0.0) -> str: ...
 
 
 async def async_func(items: list[str]) -> None: ...
+
+
+def lazy_loader() -> dict:
+    import json  # scoped import — should appear with scope="lazy_loader"
+    return json.loads("{}")
+
+

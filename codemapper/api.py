@@ -50,31 +50,79 @@ app = FastAPI(
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _symbol_dict(sym, level: int) -> dict:
-    d: dict = {"name": sym.name, "kind": sym.kind, "line": sym.line}
+def _method_dict(sym, level: int) -> dict:
+    d: dict = {"name": sym.name, "line": sym.line, "decorators": sym.decorators}
     if level >= 2:
         d["signature"] = sym.signature
-        d["parent"] = sym.parent
     return d
 
 
+def _func_dict(sym, level: int) -> dict:
+    d: dict = {"name": sym.name, "line": sym.line, "decorators": sym.decorators}
+    if level >= 2:
+        d["signature"] = sym.signature
+    return d
+
+
+def _grouped_symbols(pf, level: int, include_variables: bool = False) -> dict:
+    classes_by_name: dict[str, dict] = {}
+    functions: list[dict] = []
+    constants: list[dict] = []
+    variables: list[dict] = []
+
+    for sym in pf.symbols:
+        if sym.kind == "class":
+            classes_by_name[sym.name] = {
+                "name": sym.name,
+                "line": sym.line,
+                "decorators": sym.decorators,
+                "methods": [],
+            }
+        elif sym.kind == "function":
+            functions.append(_func_dict(sym, level))
+        elif sym.kind == "constant":
+            constants.append({"name": sym.name, "line": sym.line})
+        elif sym.kind == "variable" and include_variables:
+            variables.append({"name": sym.name, "line": sym.line})
+
+    for sym in pf.symbols:
+        if sym.kind == "method" and sym.parent and sym.parent in classes_by_name:
+            classes_by_name[sym.parent]["methods"].append(_method_dict(sym, level))
+
+    result: dict = {}
+    if constants:
+        result["constants"] = constants
+    if include_variables and variables:
+        result["variables"] = variables
+    if functions:
+        result["functions"] = functions
+    if classes_by_name:
+        result["classes"] = list(classes_by_name.values())
+    return result
+
+
 def _file_response(pf, level: int) -> dict:
+    global_imports = [asdict(i) for i in pf.imports if i.scope is None]
+    scoped_imports = [asdict(i) for i in pf.imports if i.scope is not None]
+
     result: dict = {
         "path": pf.path,
         "level": level,
         "module_doc": pf.module_doc,
-        "imports": [asdict(i) for i in pf.imports],
-        "symbols": [],
+        "imports": {
+            "global": global_imports,
+            "scoped": scoped_imports,
+        },
     }
     if level >= 1:
-        result["symbols"] = [_symbol_dict(s, level) for s in pf.symbols]
+        result.update(_grouped_symbols(pf, level, include_variables=True))
     return result
 
 
 def _map_entry(pf, level: int) -> dict:
     entry: dict = {"module_doc": pf.module_doc}
     if level >= 1:
-        entry["symbols"] = [_symbol_dict(s, level) for s in pf.symbols]
+        entry.update(_grouped_symbols(pf, level, include_variables=False))
     return entry
 
 

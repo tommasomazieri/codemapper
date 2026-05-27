@@ -8,18 +8,56 @@ from codemapper.index import CodeIndex
 from codemapper.parser import ParsedFile
 
 
-def _format_symbol(sym, level: int) -> dict:
-    d: dict = {"name": sym.name, "kind": sym.kind, "line": sym.line}
+def _method_dict(sym, level: int) -> dict:
+    d: dict = {"name": sym.name, "line": sym.line, "decorators": sym.decorators}
     if level >= 2:
         d["signature"] = sym.signature
-        d["parent"] = sym.parent
     return d
+
+
+def _func_dict(sym, level: int) -> dict:
+    d: dict = {"name": sym.name, "line": sym.line, "decorators": sym.decorators}
+    if level >= 2:
+        d["signature"] = sym.signature
+    return d
+
+
+def _grouped_symbols(pf: ParsedFile, level: int) -> dict:
+    classes_by_name: dict[str, dict] = {}
+    functions: list[dict] = []
+    constants: list[dict] = []
+
+    for sym in pf.symbols:
+        if sym.kind == "class":
+            classes_by_name[sym.name] = {
+                "name": sym.name,
+                "line": sym.line,
+                "decorators": sym.decorators,
+                "methods": [],
+            }
+        elif sym.kind == "function":
+            functions.append(_func_dict(sym, level))
+        elif sym.kind == "constant":
+            constants.append({"name": sym.name, "line": sym.line})
+
+    for sym in pf.symbols:
+        if sym.kind == "method" and sym.parent and sym.parent in classes_by_name:
+            classes_by_name[sym.parent]["methods"].append(_method_dict(sym, level))
+
+    result: dict = {}
+    if constants:
+        result["constants"] = constants
+    if functions:
+        result["functions"] = functions
+    if classes_by_name:
+        result["classes"] = list(classes_by_name.values())
+    return result
 
 
 def _format_file(pf: ParsedFile, level: int) -> dict:
     result: dict = {"module_doc": pf.module_doc}
     if level >= 1:
-        result["symbols"] = [_format_symbol(s, level) for s in pf.symbols]
+        result.update(_grouped_symbols(pf, level))
     return result
 
 
@@ -73,27 +111,26 @@ class Session:
         # Level 0 fields newly available
         if from_level < 0:
             delta["module_doc"] = pf.module_doc
-            delta["imports"] = [asdict(i) for i in pf.imports]
+            global_imports = [asdict(i) for i in pf.imports if i.scope is None]
+            scoped_imports = [asdict(i) for i in pf.imports if i.scope is not None]
+            delta["imports"] = {"global": global_imports, "scoped": scoped_imports}
 
-        # Level 1 adds symbols (without signatures)
+        # Level 1 adds grouped structure (no signatures)
         if from_level < 1 <= to_level:
-            delta["symbols"] = [
-                {"name": s.name, "kind": s.kind, "line": s.line}
-                for s in pf.symbols
-            ]
+            delta.update(_grouped_symbols(pf, 1))
 
-        # Level 2 adds signatures to existing symbols
-        if from_level < 2 <= to_level and from_level >= 1:
-            sigs = {s.name: s.signature for s in pf.symbols if s.signature}
+        # Level 2 when jumping directly from <1 — include full grouped structure with sigs
+        elif from_level < 1 and to_level >= 2:
+            delta.update(_grouped_symbols(pf, 2))
+
+        # Level 2 upgrade from level 1 — add signatures to what's already known
+        elif from_level < 2 <= to_level and from_level >= 1:
+            sigs: dict[str, str | None] = {}
+            for s in pf.symbols:
+                if s.kind in ("function", "method") and s.signature:
+                    sigs[s.name] = s.signature
             if sigs:
                 delta["signatures"] = sigs
-
-        # Level 2 when jumping directly from <1 — include full symbol objects
-        if from_level < 1 and to_level >= 2:
-            delta["symbols"] = [
-                {"name": s.name, "kind": s.kind, "line": s.line, "signature": s.signature, "parent": s.parent}
-                for s in pf.symbols
-            ]
 
         return delta
 

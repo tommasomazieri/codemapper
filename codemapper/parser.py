@@ -2,7 +2,7 @@
 
 import ast
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 
@@ -12,15 +12,17 @@ class ImportInfo:
     alias: str | None
     kind: str  # "local" | "stdlib" | "package"
     line: int
+    scope: str | None = None  # None = module-level; function/method name if inside one
 
 
 @dataclass
 class Symbol:
     name: str
-    kind: str  # "class" | "function" | "method" | "constant"
+    kind: str  # "class" | "function" | "method" | "constant" | "variable"
     line: int
     signature: str | None
     parent: str | None
+    decorators: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -85,6 +87,21 @@ def _is_constant_name(name: str) -> bool:
     return name.isupper() and len(name) > 0
 
 
+def _get_decorators(node: ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef) -> list[str]:
+    result: list[str] = []
+    for d in node.decorator_list:
+        if isinstance(d, ast.Name):
+            result.append(f"@{d.id}")
+        elif isinstance(d, ast.Attribute):
+            result.append(f"@{d.attr}")
+        elif isinstance(d, ast.Call):
+            if isinstance(d.func, ast.Name):
+                result.append(f"@{d.func.id}")
+            elif isinstance(d.func, ast.Attribute):
+                result.append(f"@{d.func.attr}")
+    return result
+
+
 def _collect_imports(node: ast.Import | ast.ImportFrom) -> list[ImportInfo]:
     infos: list[ImportInfo] = []
     if isinstance(node, ast.Import):
@@ -144,6 +161,7 @@ def parse_file(path: Path, root: Path | None = None) -> ParsedFile:
                 line=node.lineno,
                 signature=None,
                 parent=None,
+                decorators=_get_decorators(node),
             ))
             for child in ast.iter_child_nodes(node):
                 if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -153,6 +171,7 @@ def parse_file(path: Path, root: Path | None = None) -> ParsedFile:
                         line=child.lineno,
                         signature=_build_signature(child),
                         parent=node.name,
+                        decorators=_get_decorators(child),
                     ))
 
         elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -162,28 +181,55 @@ def parse_file(path: Path, root: Path | None = None) -> ParsedFile:
                 line=node.lineno,
                 signature=_build_signature(node),
                 parent=None,
+                decorators=_get_decorators(node),
             ))
+            # Collect imports inside function bodies (scoped/lazy imports)
+            for child in ast.walk(node):
+                if child is node:
+                    continue
+                if isinstance(child, (ast.Import, ast.ImportFrom)):
+                    for imp in _collect_imports(child):
+                        imp.scope = node.name
+                        imports.append(imp)
 
         elif isinstance(node, ast.Assign):
             for target in node.targets:
-                if isinstance(target, ast.Name) and _is_constant_name(target.id):
+                if isinstance(target, ast.Name):
+                    if _is_constant_name(target.id):
+                        symbols.append(Symbol(
+                            name=target.id,
+                            kind="constant",
+                            line=node.lineno,
+                            signature=None,
+                            parent=None,
+                        ))
+                    else:
+                        symbols.append(Symbol(
+                            name=target.id,
+                            kind="variable",
+                            line=node.lineno,
+                            signature=None,
+                            parent=None,
+                        ))
+
+        elif isinstance(node, ast.AnnAssign):
+            if isinstance(node.target, ast.Name):
+                if _is_constant_name(node.target.id):
                     symbols.append(Symbol(
-                        name=target.id,
+                        name=node.target.id,
                         kind="constant",
                         line=node.lineno,
                         signature=None,
                         parent=None,
                     ))
-
-        elif isinstance(node, ast.AnnAssign):
-            if isinstance(node.target, ast.Name) and _is_constant_name(node.target.id):
-                symbols.append(Symbol(
-                    name=node.target.id,
-                    kind="constant",
-                    line=node.lineno,
-                    signature=None,
-                    parent=None,
-                ))
+                else:
+                    symbols.append(Symbol(
+                        name=node.target.id,
+                        kind="variable",
+                        line=node.lineno,
+                        signature=None,
+                        parent=None,
+                    ))
 
     return ParsedFile(path=rel_path, module_doc=module_doc, imports=imports, symbols=symbols)
 
