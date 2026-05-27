@@ -73,8 +73,8 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------------------
 
     section("/file/{path}  —  single file detail")
-    get("/file/codemapper/parser.py", {"level": 0}, "GET /file/codemapper/parser.py?level=0")
-    get("/file/codemapper/parser.py", {"level": 2}, "GET /file/codemapper/parser.py?level=2")
+    get("/file/src/main.py", {"level": 0}, "GET /file/src/main.py?level=0")
+    get("/file/src/main.py", {"level": 2}, "GET /file/src/main.py?level=2")
     get("/file/nonexistent.py", label="GET /file/nonexistent.py  (expect 404)")
 
     # ---------------------------------------------------------------------------
@@ -82,19 +82,19 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------------------
 
     section("/symbol/{name}  —  definition lookup")
-    get("/symbol/ParsedFile", label="GET /symbol/ParsedFile")
-    get("/symbol/CodeIndex",  label="GET /symbol/CodeIndex")
+    get("/symbol/GameSession", label="GET /symbol/GameSession")
+    get("/symbol/Player",      label="GET /symbol/Player")
 
     section("/usages/{name}  —  all usage sites")
-    get("/usages/ParsedFile", label="GET /usages/ParsedFile")
+    get("/usages/GameSession", label="GET /usages/GameSession")
 
     section("/imports/{module}  —  files that import a module")
     get("/imports/fastapi",    label="GET /imports/fastapi")
     get("/imports/dataclasses", label="GET /imports/dataclasses")
 
     section("/search  —  fuzzy symbol search")
-    get("/search", {"q": "parse"}, "GET /search?q=parse")
-    get("/search", {"q": "index"}, "GET /search?q=index")
+    get("/search", {"q": "session"}, "GET /search?q=session")
+    get("/search", {"q": "player"},  "GET /search?q=player")
 
     # ---------------------------------------------------------------------------
     # /packages
@@ -115,26 +115,26 @@ if __name__ == "__main__":
 
     post(
         f"/session/{sid}/expand",
-        {"path": "codemapper/parser.py", "level": 1},
-        f"POST /session/{sid[:8]}…/expand  path=parser.py level=1  (first call → full delta)",
+        {"path": "src/main.py", "level": 1},
+        f"POST /session/{sid[:8]}…/expand  path=src/main.py level=1  (first call → full delta)",
     )
 
     post(
         f"/session/{sid}/expand",
-        {"path": "codemapper/parser.py", "level": 1},
-        f"POST /session/{sid[:8]}…/expand  path=parser.py level=1  (repeat → delta=null)",
+        {"path": "src/main.py", "level": 1},
+        f"POST /session/{sid[:8]}…/expand  path=src/main.py level=1  (repeat → delta=null)",
     )
 
     post(
         f"/session/{sid}/expand",
-        {"path": "codemapper/parser.py", "level": 2},
-        f"POST /session/{sid[:8]}…/expand  path=parser.py level=2  (upgrade L1→L2 → sig delta)",
+        {"path": "src/main.py", "level": 2},
+        f"POST /session/{sid[:8]}…/expand  path=src/main.py level=2  (upgrade L1→L2 → sig delta)",
     )
 
     post(
         f"/session/{sid}/expand",
-        {"path": "codemapper/index.py", "level": 1},
-        f"POST /session/{sid[:8]}…/expand  path=index.py level=1  (new file → full delta)",
+        {"path": "src/managers/managers_hub.py", "level": 1},
+        f"POST /session/{sid[:8]}…/expand  path=managers_hub.py level=1  (new file → full delta)",
     )
 
     # ---------------------------------------------------------------------------

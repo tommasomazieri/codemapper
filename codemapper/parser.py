@@ -191,7 +191,7 @@ def parse_file(path: Path, root: Path | None = None) -> ParsedFile:
 def parse_repo(root: Path) -> dict[str, ParsedFile]:
     py_files = [
         p for p in root.rglob("*.py")
-        if "__pycache__" not in p.parts and ".git" not in p.parts
+        if "__pycache__" not in p.parts and ".git" not in p.parts and ".venv" not in p.parts
     ]
 
     parsed: dict[str, ParsedFile] = {}

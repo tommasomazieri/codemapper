@@ -200,7 +200,7 @@ class CodeIndex:
     def _current_mtimes(self) -> dict[str, float]:
         mtimes: dict[str, float] = {}
         for py in self.root.rglob("*.py"):
-            if "__pycache__" in py.parts or ".git" in py.parts:
+            if "__pycache__" in py.parts or ".git" in py.parts or ".venv" in py.parts:
                 continue
             key = py.relative_to(self.root).as_posix()
             try:
