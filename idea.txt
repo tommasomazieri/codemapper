@@ -1,0 +1,29 @@
+here we will create a software that is Claude Code compatible, that will work much like this service: https://aider.chat/docs/repomap.html
+
+Its main scope is to: map the repository it is in, and through programmatic scanning of the content, build a tree structure where leaves are file content, organized as such:
+* header - """section""" of the .py file if present
+* global imports list - the ones in the header of the file
+* local imports list - if any inline import, showing the context (class.method; line)
+* content - ONLY the names of classes, functions and methods in the script
+
+content may be even broken down further, like:
+CONSTANTS -> free floating constants
+variables -> free floating variables
+functions -> free floating functions
+classes   -> Class1; method1, method2... | Class2; ...
+
+We must hold high level, just names of classes, methods, functions... we MAY want to go as far as show shit like:
+func(par1, par2, ...) -> output
+
+the way we present this map must for sure be improved, both in what it shows and HOW (and ESPECIALLY WHEN!). For example, we may make it expandable and collapsible, thus showing more info as the agent actually learns what and where it needs to go...
+
+-----------------------------------------------
+
+Then we may offer on-the-go methods like, checking where a specific variable or function is ACTUALLY being used and so on, thus not having to load ENTIRE FILES to search it, but i think grep deals it it just fine. the agent has NO LONGER to scout around, it inputs a query and a deterministically correct output is received for it to build its plan and so on. 
+
+-----------------------------------------------
+
+So basically, a software that stays BETWEEN the agent AND the codebase. agent talks with the SOFTWARE first, it queries the codebase through it, aiming to get the most efficient in tokens, and higher quality in production, workflow as possible. 
+
+Use aider as inspiration to lay down the work for this software. the software has no need to have any UI or frontend. it can expose its methods and scripts through an API and CLI layer. 
+
