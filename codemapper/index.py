@@ -1,0 +1,238 @@
+"""Repo-wide symbol index with incremental refresh."""
+
+import ast
+import json
+from dataclasses import dataclass, asdict
+from pathlib import Path
+
+from codemapper.parser import ImportInfo, ParsedFile, Symbol, parse_repo
+
+
+@dataclass
+class SymbolLocation:
+    file: str
+    name: str
+    kind: str
+    line: int
+    parent: str | None
+
+
+@dataclass
+class UsageLocation:
+    file: str
+    line: int
+    context: str  # stripped source line
+
+
+@dataclass
+class SymbolMatch:
+    file: str
+    name: str
+    kind: str
+    line: int
+
+
+@dataclass
+class PackageInfo:
+    name: str
+    version: str
+    used_in: list[str]
+
+
+_CACHE_VERSION = 1
+_CACHE_FILE = ".codemapper_cache.json"
+
+
+def _pf_to_dict(pf: ParsedFile) -> dict:
+    return asdict(pf)
+
+
+def _dict_to_pf(d: dict) -> ParsedFile:
+    return ParsedFile(
+        path=d["path"],
+        module_doc=d["module_doc"],
+        imports=[ImportInfo(**i) for i in d["imports"]],
+        symbols=[Symbol(**s) for s in d["symbols"]],
+    )
+
+
+class CodeIndex:
+    def __init__(self, root: Path) -> None:
+        self.root = root.resolve()
+        self._files: dict[str, ParsedFile] = {}
+        self._mtimes: dict[str, float] = {}
+
+    def build(self) -> None:
+        self._files = parse_repo(self.root)
+        self._mtimes = self._current_mtimes()
+        self._save_cache()
+
+    def refresh(self) -> None:
+        if not self._load_cache():
+            self.build()
+            return
+
+        current = self._current_mtimes()
+        stale = [p for p, mt in current.items() if self._mtimes.get(p) != mt]
+        removed = [p for p in list(self._files) if p not in current]
+
+        for path_key in removed:
+            del self._files[path_key]
+
+        if stale:
+            for path_key in stale:
+                abs_path = self.root / Path(path_key)
+                from codemapper.parser import parse_file
+                pf = parse_file(abs_path, self.root)
+                self._files[pf.path] = pf
+
+            # Re-run import classification for changed files
+            from codemapper.parser import parse_repo as _parse_repo  # noqa: F811
+            # Reuse the classification logic by re-parsing the full repo if any file changed
+            # (classification is cross-file: local stems from all files)
+            self._files = _parse_repo(self.root)
+            self._mtimes = self._current_mtimes()
+            self._save_cache()
+        else:
+            self._mtimes = current
+
+    def get_file(self, path: str) -> ParsedFile | None:
+        return self._files.get(path)
+
+    def all_files(self) -> list[str]:
+        return sorted(self._files.keys())
+
+    def find_symbol(self, name: str) -> list[SymbolLocation]:
+        results: list[SymbolLocation] = []
+        for pf in self._files.values():
+            for sym in pf.symbols:
+                if sym.name == name:
+                    results.append(SymbolLocation(
+                        file=pf.path,
+                        name=sym.name,
+                        kind=sym.kind,
+                        line=sym.line,
+                        parent=sym.parent,
+                    ))
+        return results
+
+    def find_usages(self, name: str) -> list[UsageLocation]:
+        results: list[UsageLocation] = []
+        for path_key in self._files:
+            abs_path = self.root / Path(path_key)
+            try:
+                source = abs_path.read_text(encoding="utf-8", errors="replace")
+                tree = ast.parse(source, filename=str(abs_path))
+            except (OSError, SyntaxError):
+                continue
+
+            lines = source.splitlines()
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Name) and node.id == name:
+                    ctx_line = lines[node.lineno - 1].strip() if node.lineno <= len(lines) else ""
+                    results.append(UsageLocation(file=path_key, line=node.lineno, context=ctx_line))
+                elif isinstance(node, ast.Attribute) and node.attr == name:
+                    ctx_line = lines[node.lineno - 1].strip() if node.lineno <= len(lines) else ""
+                    results.append(UsageLocation(file=path_key, line=node.lineno, context=ctx_line))
+
+        # deduplicate by (file, line)
+        seen: set[tuple[str, int]] = set()
+        deduped: list[UsageLocation] = []
+        for u in results:
+            key = (u.file, u.line)
+            if key not in seen:
+                seen.add(key)
+                deduped.append(u)
+        return sorted(deduped, key=lambda u: (u.file, u.line))
+
+    def find_imports(self, module: str) -> list[str]:
+        results: list[str] = []
+        for pf in self._files.values():
+            for imp in pf.imports:
+                if imp.module == module or imp.module.startswith(module + "."):
+                    results.append(pf.path)
+                    break
+        return sorted(results)
+
+    def search(self, query: str) -> list[SymbolMatch]:
+        q = query.lower()
+        results: list[SymbolMatch] = []
+        for pf in self._files.values():
+            for sym in pf.symbols:
+                if q in sym.name.lower():
+                    results.append(SymbolMatch(
+                        file=pf.path,
+                        name=sym.name,
+                        kind=sym.kind,
+                        line=sym.line,
+                    ))
+        return sorted(results, key=lambda m: (m.file, m.line))
+
+    def packages(self) -> list[PackageInfo]:
+        try:
+            import importlib.metadata as meta
+        except ImportError:
+            return []
+
+        # Collect package imports across all files
+        package_files: dict[str, set[str]] = {}
+        for pf in self._files.values():
+            for imp in pf.imports:
+                if imp.kind == "package" and imp.module:
+                    top = imp.module.split(".")[0]
+                    package_files.setdefault(top, set()).add(pf.path)
+
+        results: list[PackageInfo] = []
+        seen: set[str] = set()
+        for dist in meta.distributions():
+            name = dist.metadata["Name"]
+            if not name or name in seen:
+                continue
+            seen.add(name)
+            version = dist.metadata["Version"] or ""
+            # Match by normalized name (lowercase, dashes=underscores)
+            normalized = name.lower().replace("-", "_")
+            used_in = sorted(package_files.get(normalized, set()) | package_files.get(name.lower(), set()))
+            results.append(PackageInfo(name=name, version=version, used_in=used_in))
+
+        return sorted(results, key=lambda p: p.name.lower())
+
+    def _current_mtimes(self) -> dict[str, float]:
+        mtimes: dict[str, float] = {}
+        for py in self.root.rglob("*.py"):
+            if "__pycache__" in py.parts or ".git" in py.parts:
+                continue
+            key = py.relative_to(self.root).as_posix()
+            try:
+                mtimes[key] = py.stat().st_mtime
+            except OSError:
+                pass
+        return mtimes
+
+    def _save_cache(self) -> None:
+        cache = {
+            "version": _CACHE_VERSION,
+            "root": str(self.root),
+            "mtimes": self._mtimes,
+            "files": {k: _pf_to_dict(v) for k, v in self._files.items()},
+        }
+        cache_path = self.root / _CACHE_FILE
+        cache_path.write_text(json.dumps(cache, indent=2), encoding="utf-8")
+
+    def _load_cache(self) -> bool:
+        cache_path = self.root / _CACHE_FILE
+        if not cache_path.exists():
+            return False
+        try:
+            data = json.loads(cache_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            return False
+
+        if data.get("version") != _CACHE_VERSION:
+            return False
+        if data.get("root") != str(self.root):
+            return False
+
+        self._mtimes = data.get("mtimes", {})
+        self._files = {k: _dict_to_pf(v) for k, v in data.get("files", {}).items()}
+        return True
