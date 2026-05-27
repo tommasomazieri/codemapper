@@ -53,7 +53,3 @@ codemapper packages --json
 
 Levels 3+ (docstrings, full source) are intentionally out of scope — use grep/read for those.
 
-## Workflow rules
-
-- **Before planning**: always run `git pull` to ensure the local branch is up to date.
-- **After implementing a plan**: always `git add`, `git commit`, and `git push` to persist the work.
