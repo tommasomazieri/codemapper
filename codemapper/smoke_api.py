@@ -1,10 +1,14 @@
 """
-Manual API endpoint tester.
-Start the server first:  uvicorn codemapper.api:app --reload
-Then run:                python test_api.py
+Manual API endpoint tester — auto-starts the server if not running.
+Run:  python smoke_api.py
 """
 
+import os
+import subprocess
 import sys
+import time
+from pathlib import Path
+
 import httpx
 from rich.console import Console
 from rich.panel import Panel
@@ -12,7 +16,9 @@ from rich.pretty import Pretty
 from rich.rule import Rule
 from rich.text import Text
 
-BASE = "http://localhost:8001"
+PORT = 8001
+BASE = f"http://localhost:{PORT}"
+ROOT = r"C:\Users\tomin\OneDrive\Desktop\PROGETTI\operating_proejcts\The Great Real Estate Boardgame\companion_web_app"
 console = Console()
 
 
@@ -42,16 +48,36 @@ def post(path: str, data: dict | None = None, label: str | None = None) -> objec
 
 
 # ---------------------------------------------------------------------------
-# Ping
+# Auto-start server
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    _server_proc = None
     try:
-        httpx.get(BASE + "/map", timeout=3)
+        httpx.get(BASE + "/map", timeout=2)
+        console.print(f"[dim]Server already running on {BASE}[/dim]")
     except httpx.ConnectError:
-        console.print("[bold red]Cannot reach server at http://localhost:8000[/bold red]")
-        console.print("Start it with:  [bold]uvicorn codemapper.api:app --reload[/bold]")
-        sys.exit(1)
+        console.print(f"[yellow]Starting server on port {PORT}...[/yellow]")
+        env = os.environ.copy()
+        env["CODEMAPPER_ROOT"] = ROOT
+        _server_proc = subprocess.Popen(
+            [sys.executable, "-m", "uvicorn", "codemapper.api:app", "--port", str(PORT)],
+            cwd=str(Path(__file__).parent),
+            env=env,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        for _ in range(15):
+            time.sleep(1)
+            try:
+                httpx.get(BASE + "/map", timeout=1)
+                break
+            except httpx.ConnectError:
+                pass
+        else:
+            console.print(f"[bold red]Server failed to start on {BASE}[/bold red]")
+            _server_proc.terminate()
+            sys.exit(1)
 
     console.print(Panel(
         "[bold green]codemapper API — endpoint test run[/bold green]\n"
@@ -150,3 +176,6 @@ if __name__ == "__main__":
 
     console.print()
     console.print(Panel("[bold green]All endpoints tested.[/bold green]", border_style="green"))
+
+    if _server_proc is not None:
+        _server_proc.terminate()
