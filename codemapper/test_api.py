@@ -12,7 +12,7 @@ from rich.pretty import Pretty
 from rich.rule import Rule
 from rich.text import Text
 
-BASE = "http://localhost:8000"
+BASE = "http://localhost:8001"
 console = Console()
 
 
