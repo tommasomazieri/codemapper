@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 from codemapper.index import CodeIndex
 from codemapper.session import Session
+from codemapper.staleness import STALE_COMMIT_THRESHOLD, analyze_staleness
 
 
 # ---------------------------------------------------------------------------
@@ -115,6 +116,7 @@ def _file_response(pf, level: int) -> dict:
         },
     }
     if level >= 1:
+        result["module_doc_full"] = pf.module_doc_full
         result.update(_grouped_symbols(pf, level, include_variables=True))
     return result
 
@@ -126,15 +128,60 @@ def _map_entry(pf, level: int) -> dict:
     return entry
 
 
+def _doc_entry(doc, level: int) -> dict:
+    """Doc summary for /docs and the map's docs block. level 0 = kind only."""
+    if level < 1:
+        return {"kind": doc.kind}
+    entry: dict = {"kind": doc.kind}
+    if doc.top_keys:
+        entry["top_keys"] = doc.top_keys
+    if doc.headings:
+        entry["headings"] = doc.headings
+    if doc.wikilinks:
+        entry["wikilinks"] = doc.wikilinks
+    return entry
+
+
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
 
 @app.get("/map")
-async def get_map(level: int = 0) -> dict:
+async def get_map(level: int = 0, include_docs: bool = False) -> dict:
     index: CodeIndex = app.state.index
     files = {path: _map_entry(index.get_file(path), level) for path in index.all_files()}
-    return {"root": str(app.state.root), "level": level, "files": files}
+    result: dict = {"root": str(app.state.root), "level": level, "files": files}
+    if include_docs:
+        result["docs"] = {path: _doc_entry(index.get_doc(path), 0) for path in index.all_docs()}
+    return result
+
+
+@app.get("/docfiles")
+async def get_docfiles(level: int = 0) -> dict:
+    index: CodeIndex = app.state.index
+    docs = {path: _doc_entry(index.get_doc(path), level) for path in index.all_docs()}
+    return {"root": str(app.state.root), "level": level, "docs": docs}
+
+
+@app.get("/doc/{path:path}")
+async def get_doc(path: str) -> dict:
+    index: CodeIndex = app.state.index
+    doc = index.get_doc(path)
+    if doc is None:
+        raise HTTPException(status_code=404, detail=f"Doc not found in index: {path}")
+    return asdict(doc)
+
+
+@app.get("/staleness")
+async def get_staleness() -> dict:
+    index: CodeIndex = app.state.index
+    findings = analyze_staleness(app.state.root, index)
+    return {
+        "root": str(app.state.root),
+        "threshold": STALE_COMMIT_THRESHOLD,
+        "findings": [asdict(f) for f in findings],
+        "stale_count": sum(1 for f in findings if f.stale),
+    }
 
 
 @app.get("/file/{path:path}")

@@ -140,3 +140,76 @@ def test_file_no_flat_symbols(client):
     r = client.get("/file/sample_module.py?level=1")
     data = r.json()
     assert "symbols" not in data
+
+
+# ── module_doc_full ─────────────────────────────────────────────────────────
+
+def test_file_level0_no_full_doc(client):
+    r = client.get("/file/sample_module.py?level=0")
+    data = r.json()
+    assert "module_doc_full" not in data
+
+
+def test_file_level1_has_full_doc(client):
+    r = client.get("/file/sample_module.py?level=1")
+    data = r.json()
+    assert data["module_doc"] == "Sample module for testing codemapper parser."
+    assert "second line" in data["module_doc_full"]
+
+
+# ── /docs and /doc ──────────────────────────────────────────────────────────
+
+def test_docfiles_level0_kind_only(client):
+    r = client.get("/docfiles?level=0")
+    assert r.status_code == 200
+    docs = r.json()["docs"]
+    assert docs["sample.json"] == {"kind": "json"}
+    assert "sample.md" in docs
+
+
+def test_docfiles_level1_details(client):
+    r = client.get("/docfiles?level=1")
+    docs = r.json()["docs"]
+    assert docs["sample.json"]["top_keys"] == ["name", "settings", "version"]
+    assert docs["sample.md"]["headings"][0] == "# Sample Doc"
+    assert docs["sample.md"]["wikilinks"] == ["other-doc", "notes"]
+
+
+def test_doc_single(client):
+    r = client.get("/doc/sample.toml")
+    assert r.status_code == 200
+    data = r.json()
+    assert data["kind"] == "toml"
+    assert data["top_keys"] == ["build-system", "project"]
+
+
+def test_doc_not_found(client):
+    assert client.get("/doc/nope.json").status_code == 404
+
+
+# ── /map?include_docs ───────────────────────────────────────────────────────
+
+def test_map_include_docs(client):
+    r = client.get("/map?level=0&include_docs=true")
+    data = r.json()
+    assert "docs" in data
+    assert data["docs"]["sample.json"] == {"kind": "json"}
+
+
+def test_map_excludes_docs_by_default(client):
+    r = client.get("/map?level=0")
+    assert "docs" not in r.json()
+
+
+# ── /staleness ──────────────────────────────────────────────────────────────
+
+def test_staleness_shape(client):
+    r = client.get("/staleness")
+    assert r.status_code == 200
+    data = r.json()
+    assert data["threshold"] == 5
+    assert isinstance(data["stale_count"], int)
+    paths = {f["path"] for f in data["findings"]}
+    assert "sample_module.py" in paths
+    for f in data["findings"]:
+        assert set(f) >= {"path", "has_docstring", "stale", "reason", "code_commits_since"}

@@ -108,6 +108,31 @@ the agent uses its standard web search or documentation tools.
 
 ---
 
+## Beyond Python: deterministic context for the whole repo
+
+Real repos aren't only `.py`. codemapper gives agents lightweight, **deterministic**
+awareness of the other files too — without any AI:
+
+- **Config files** (`JSON` / `TOML` / `YAML`) → top-level keys, so an agent knows a
+  `pyproject.toml` or settings file exists and roughly what it holds.
+- **Markdown** → headings and `[[wikilinks]]`, since dropped-in `.md` files are a
+  cheap, writer-maintained way to carry repo context.
+- Everything else → listed by path so the agent at least knows it's there.
+
+`codemapper docfiles` / `GET /docfiles` expose this alongside the Python map.
+
+## Staleness: a deterministic anti-slop signal
+
+Module docstrings (`"""..."""` headers) are the cheapest contextual cue for `.py`
+files — but they're brittle: writers forget to update them, so the "context" rots.
+Rather than regenerate it with an LLM (expensive, and itself goes stale),
+codemapper **flags** it: if a file's code churned through many commits since its
+docstring was last touched (measured from git history), the docstring is reported
+as likely stale. `codemapper staleness` / `GET /staleness`.
+
+This is the deterministic seed of a larger `fallow`-style quality analyzer; see
+`fallow-for-python.md`.
+
 ## Architecture Overview
 
 ```
@@ -141,7 +166,8 @@ The agent can use codemapper in two ways:
 - Not a code editor or file writer
 - Not a replacement for grep — targeted text search is still grep's job
 - Not a full language server (no type inference, no go-to-definition via LSP)
-- Not multi-language in v1 — Python only (extensible later with tree-sitter)
+- Not multi-language for *symbol* parsing in v1 — deep AST analysis is Python only
+  (non-`.py` files get light metadata: config keys, markdown headings/wikilinks)
 - Not a cloud service — runs entirely locally, on the target machine
 
 ---

@@ -115,13 +115,11 @@ class Session:
             scoped_imports = [asdict(i) for i in pf.imports if i.scope is not None]
             delta["imports"] = {"global": global_imports, "scoped": scoped_imports}
 
-        # Level 1 adds grouped structure (no signatures)
+        # Crossing into level >= 1: add full docstring + grouped structure
+        # (signatures included when to_level >= 2, e.g. a direct 0 -> 2 jump).
         if from_level < 1 <= to_level:
-            delta.update(_grouped_symbols(pf, 1))
-
-        # Level 2 when jumping directly from <1 — include full grouped structure with sigs
-        elif from_level < 1 and to_level >= 2:
-            delta.update(_grouped_symbols(pf, 2))
+            delta["module_doc_full"] = pf.module_doc_full
+            delta.update(_grouped_symbols(pf, to_level))
 
         # Level 2 upgrade from level 1 — add signatures to what's already known
         elif from_level < 2 <= to_level and from_level >= 1:

@@ -14,9 +14,19 @@ tokens consumed while maximizing structural awareness.
 
 ## Key Directories
 
-- `codemapper/` — main package (parser, index, session, api, cli)
-- `docs/` — design docs: `idea.md` (product spec), `architecture.md` (technical design)
+- `codemapper/` — main package (parser, docparser, staleness, index, session, api, cli)
+- `docs/` — design docs: `idea.md` (product spec), `architecture.md` (technical
+  design), `fallow-for-python.md` (deferred quality-analyzer follow-up)
 - `tests/` — pytest tests
+
+## Beyond Python (deterministic, no AI)
+
+- **Non-`.py` files** (`docparser.py`): config files (JSON/TOML/YAML) expose
+  top-level keys; markdown exposes headings + `[[wikilinks]]`; other files are
+  listed by path. Served via `GET /docfiles` and the `--include-docs` map flag.
+- **Docstring staleness** (`staleness.py`): `GET /staleness` flags module
+  docstrings likely rotted because code churned since the header was last touched
+  (git-based). Deterministic anti-slop signal.
 
 ## Running locally
 

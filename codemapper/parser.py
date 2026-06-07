@@ -28,9 +28,12 @@ class Symbol:
 @dataclass
 class ParsedFile:
     path: str  # relative to repo root, posix slashes
-    module_doc: str | None
+    module_doc: str | None  # first line only (level-0 token economy)
     imports: list[ImportInfo]
     symbols: list[Symbol]
+    module_doc_full: str | None = None  # complete module docstring (deep queries only)
+    doc_start_line: int | None = None  # 1-based start line of module docstring, if any
+    doc_end_line: int | None = None  # 1-based end line of module docstring, if any
 
 
 def _build_signature(node: ast.FunctionDef | ast.AsyncFunctionDef) -> str:
@@ -81,6 +84,16 @@ def _build_signature(node: ast.FunctionDef | ast.AsyncFunctionDef) -> str:
     if node.returns:
         sig += f" -> {ast.unparse(node.returns)}"
     return sig
+
+
+def _docstring_span(tree: ast.Module) -> tuple[int | None, int | None]:
+    """Line span (1-based, inclusive) of the module docstring, or (None, None)."""
+    if not tree.body:
+        return None, None
+    first = tree.body[0]
+    if isinstance(first, ast.Expr) and isinstance(first.value, ast.Constant) and isinstance(first.value.value, str):
+        return first.lineno, getattr(first, "end_lineno", first.lineno)
+    return None, None
 
 
 def _is_constant_name(name: str) -> bool:
@@ -146,6 +159,8 @@ def parse_file(path: Path, root: Path | None = None) -> ParsedFile:
 
     raw_doc = ast.get_docstring(tree)
     module_doc = raw_doc.splitlines()[0] if raw_doc else None
+    module_doc_full = raw_doc
+    doc_start_line, doc_end_line = _docstring_span(tree)
 
     imports: list[ImportInfo] = []
     symbols: list[Symbol] = []
@@ -231,7 +246,15 @@ def parse_file(path: Path, root: Path | None = None) -> ParsedFile:
                         parent=None,
                     ))
 
-    return ParsedFile(path=rel_path, module_doc=module_doc, imports=imports, symbols=symbols)
+    return ParsedFile(
+        path=rel_path,
+        module_doc=module_doc,
+        imports=imports,
+        symbols=symbols,
+        module_doc_full=module_doc_full,
+        doc_start_line=doc_start_line,
+        doc_end_line=doc_end_line,
+    )
 
 
 def parse_repo(root: Path) -> dict[str, ParsedFile]:
