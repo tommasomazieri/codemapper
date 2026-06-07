@@ -7,6 +7,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+from codemapper.analysis import ANALYZERS, analyze
 from codemapper.index import CodeIndex
 from codemapper.session import Session
 from codemapper.staleness import STALE_COMMIT_THRESHOLD, analyze_staleness
@@ -237,6 +238,34 @@ async def expand_session(session_id: str, body: ExpandRequest) -> dict:
     if session is None:
         raise HTTPException(status_code=404, detail=f"Session not found: {session_id}")
     return session.expand(body.path, body.level)
+
+
+@app.get("/analyze")
+async def get_analyze(scope: str | None = None) -> dict:
+    index: CodeIndex = app.state.index
+    scope_list = [s.strip() for s in scope.split(",")] if scope else list(ANALYZERS)
+    result = analyze(index, app.state.root, scope=scope_list)
+    findings_out = []
+    for f in result.findings:
+        d = {
+            "rule": f.rule,
+            "severity": f.severity,
+            "path": f.path,
+            "line": f.line,
+            "symbol": f.symbol,
+            "message": f.message,
+            "introduced": f.introduced,
+            "actions": [asdict(a) for a in f.actions],
+            "metadata": f.metadata,
+        }
+        findings_out.append(d)
+    return {
+        "root": result.root,
+        "scope": result.scope,
+        "score": result.score,
+        "summary": result.summary,
+        "findings": findings_out,
+    }
 
 
 @app.post("/refresh")

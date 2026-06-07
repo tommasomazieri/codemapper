@@ -1,7 +1,8 @@
-# fallow-for-python — deferred follow-up (phase 2)
+# fallow-for-python — quality analyzer (core trio shipped; advanced passes deferred)
 
-This documents an acknowledged next thrust for codemapper. **Nothing here is
-implemented yet** — it is recorded so the intent isn't lost.
+The **core trio** (dead code, complexity, dependency hygiene) is **implemented** as
+`codemapper/analysis/` — a report-only subpackage, exposed at `GET /analyze`.
+This document records the deferred analyzers and the thinking behind the design.
 
 ## Where it comes from
 

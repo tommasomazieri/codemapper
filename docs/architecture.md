@@ -12,14 +12,22 @@ codemapper/
 ├── index.py      — repo-wide symbol + doc index, caching, incremental refresh
 ├── session.py    — progressive disclosure state management
 ├── api.py        — FastAPI REST server
-└── cli.py        — Typer CLI (wraps api or calls core directly)
+├── cli.py        — Typer CLI (wraps api or calls core directly)
+└── analysis/     — fallow-style quality analyzer (dead code, complexity, dep hygiene)
+    ├── __init__.py   — analyze() orchestrator, ANALYZERS registry
+    ├── findings.py   — Action, Finding, AnalysisResult data model
+    ├── util.py       — read_pyproject, iter_functions, collect_referenced_names, entry_point_roots
+    ├── deadcode.py   — find_dead_code(index, root)
+    ├── complexity.py — find_complexity(index, root, ...)
+    └── deps.py       — find_dependency_issues(index, root)
 ```
 
 Beyond Python symbols, codemapper now gives agents **deterministic context** about
-the rest of the repo — config files and markdown — and a **staleness signal** that
-flags module docstrings likely to have rotted as code changed. None of this uses
-AI: every output is a reproducible fact (the principle borrowed from `fallow`; see
-`fallow-for-python.md` for the deferred quality-analyzer follow-up).
+the rest of the repo — config files and markdown — a **staleness signal** that
+flags module docstrings likely to have rotted as code changed, and a
+**fallow-style quality analyzer** that finds dead code, high-complexity functions,
+and dependency hygiene issues. None of this uses AI: every output is a reproducible
+fact (the core principle borrowed from `fallow`).
 
 ---
 
@@ -173,6 +181,7 @@ state. All endpoints return JSON.
 | GET | `/docfiles` | Non-`.py` files. `?level=0` (kind only) `\|1` (keys/headings/wikilinks) |
 | GET | `/doc/{path}` | Single non-`.py` file detail (full `DocFile`) |
 | GET | `/staleness` | Docstring drift findings + `stale_count` |
+| GET | `/analyze` | Quality analysis. `?scope=dead,complexity,deps` (default: all three) |
 | GET | `/symbol/{name}` | Definition location(s) for a symbol |
 | GET | `/usages/{name}` | All usage locations for a symbol |
 | GET | `/imports/{module}` | Files that import a given module |
@@ -275,6 +284,7 @@ index (e.g. an IDE plugin or a long-running agent session).
 - `tests/test_index.py` — index build + incremental refresh
 - `tests/test_api.py` — FastAPI endpoints via `httpx.AsyncClient`
 - `tests/test_cli.py` — CLI commands via `typer.testing.CliRunner`
+- `tests/test_analysis.py` — per-analyzer + orchestrator on synthetic `tmp_path` repos
 
 Fixture files live in `tests/fixtures/` — small synthetic Python files that
 exercise all symbol types.

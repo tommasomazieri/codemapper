@@ -15,8 +15,10 @@ tokens consumed while maximizing structural awareness.
 ## Key Directories
 
 - `codemapper/` — main package (parser, docparser, staleness, index, session, api, cli)
+- `codemapper/analysis/` — fallow-style quality analyzer: dead code, complexity,
+  dep hygiene. `analyze()` orchestrator; findings are report-only (no file edits).
 - `docs/` — design docs: `idea.md` (product spec), `architecture.md` (technical
-  design), `fallow-for-python.md` (deferred quality-analyzer follow-up)
+  design), `fallow-for-python.md` (advanced passes still deferred)
 - `tests/` — pytest tests
 
 ## Beyond Python (deterministic, no AI)
@@ -27,6 +29,9 @@ tokens consumed while maximizing structural awareness.
 - **Docstring staleness** (`staleness.py`): `GET /staleness` flags module
   docstrings likely rotted because code churned since the header was last touched
   (git-based). Deterministic anti-slop signal.
+- **Quality analysis** (`analysis/`): `GET /analyze?scope=dead,complexity,deps`
+  — deterministic findings (no AI). Every finding carries `actions[]` with
+  `auto_fixable` flag as advice for the calling agent. Report-only in v1.
 
 ## Running locally
 

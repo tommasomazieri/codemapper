@@ -201,6 +201,47 @@ def test_map_excludes_docs_by_default(client):
     assert "docs" not in r.json()
 
 
+# ── /analyze ────────────────────────────────────────────────────────────────
+
+def test_analyze_default_shape(client):
+    r = client.get("/analyze")
+    assert r.status_code == 200
+    data = r.json()
+    assert "root" in data
+    assert "scope" in data
+    assert "score" in data
+    assert "summary" in data
+    assert "findings" in data
+    assert isinstance(data["score"], int)
+    assert 0 <= data["score"] <= 100
+    assert isinstance(data["findings"], list)
+
+
+def test_analyze_scope_filter(client):
+    r = client.get("/analyze?scope=deps")
+    assert r.status_code == 200
+    data = r.json()
+    assert data["scope"] == ["deps"]
+    for f in data["findings"]:
+        assert f["rule"] not in ("dead_code", "dead_file", "high_complexity")
+
+
+def test_analyze_finding_shape(client):
+    r = client.get("/analyze")
+    data = r.json()
+    for f in data["findings"]:
+        assert set(f) >= {"rule", "severity", "path", "message", "line", "symbol",
+                          "introduced", "actions", "metadata"}
+        assert f["severity"] in ("info", "warn", "error")
+
+
+def test_analyze_summary_totals_match(client):
+    r = client.get("/analyze")
+    data = r.json()
+    total = sum(data["summary"]["by_rule"].values())
+    assert total == data["summary"]["total"] == len(data["findings"])
+
+
 # ── /staleness ──────────────────────────────────────────────────────────────
 
 def test_staleness_shape(client):
