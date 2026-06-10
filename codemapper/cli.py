@@ -68,7 +68,12 @@ def _write_hook(project: Path) -> None:
     pre.append({
         "matcher": "Grep|Glob",
         "hooks": [
-            {"type": "command", "command": sys.executable, "args": ["-m", "codemapper.hook"]}
+            {
+                "type": "command",
+                "command": sys.executable,
+                "args": ["-m", "codemapper.hook"],
+                "timeout": 5000,
+            }
         ],
     })
     path.write_text(json.dumps(data, indent=2), encoding="utf-8")

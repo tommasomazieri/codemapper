@@ -135,7 +135,7 @@ def build(
             "--model", model or DEFAULT_MODEL,
         ]
 
-    subprocess.run(cmd, env=env, check=True)
+    subprocess.run(cmd, env=env, check=True, stdin=subprocess.DEVNULL)
 
 
 def query(text: str, root: Path, budget: int = 2000) -> str:
@@ -147,6 +147,7 @@ def query(text: str, root: Path, budget: int = 2000) -> str:
     result = subprocess.run(
         [exe, "query", text, "--budget", str(budget), "--graph", str(gj)],
         capture_output=True, text=True, check=True,
+        stdin=subprocess.DEVNULL, timeout=60,
     )
     return result.stdout
 
@@ -160,5 +161,6 @@ def path_query(a: str, b: str, root: Path) -> str:
     result = subprocess.run(
         [exe, "path", a, b, "--graph", str(gj)],
         capture_output=True, text=True, check=True,
+        stdin=subprocess.DEVNULL, timeout=60,
     )
     return result.stdout
