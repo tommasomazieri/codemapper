@@ -1,49 +1,51 @@
+"""FastAPI server — internal engine for the codemapper2 MCP adapter.
+
+Graph navigation uses GraphIndex (Graphify's graph_annotated.json).
+Diagnostics use the existing analyzer stack on a CodeIndex (Phase 1 bridge;
+Phase 2 will migrate analyzers to GraphIndex).
+"""
+
 import os
-import uuid
 from contextlib import asynccontextmanager
 from dataclasses import asdict
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 
 from codemapper.analysis import ANALYZERS, analyze
+from codemapper.graph_index import GraphIndex
+from codemapper.graphify_runner import path_query, query
 from codemapper.index import CodeIndex
-from codemapper.session import Session
 from codemapper.staleness import STALE_COMMIT_THRESHOLD, analyze_staleness
 
 
 # ---------------------------------------------------------------------------
-# Request / response models
+# Lifecycle
 # ---------------------------------------------------------------------------
-
-class ExpandRequest(BaseModel):
-    path: str
-    level: int = 1
-
-
-# ---------------------------------------------------------------------------
-# Application lifecycle
-# ---------------------------------------------------------------------------
-
-_sessions: dict[str, Session] = {}
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     root = Path(os.environ.get("CODEMAPPER_ROOT", ".")).resolve()
+    graph = GraphIndex(root)
+    try:
+        graph.load()
+    except FileNotFoundError:
+        pass  # graph not yet built; navigation endpoints will return 503
+
+    # Phase 1 bridge: CodeIndex for the diagnostic analyzers
     index = CodeIndex(root)
     index.build()
-    app.state.index = index
+
     app.state.root = root
+    app.state.graph = graph
+    app.state.index = index
     yield
-    # Nothing to clean up
 
 
 app = FastAPI(
-    title="codemapper",
-    description="Progressive-disclosure API for Python codebases.",
-    version="0.1.0",
+    title="codemapper2",
+    description="Graphify graph + codemapper diagnostics, unified.",
+    version="2.0.0",
     lifespan=lifespan,
 )
 
@@ -52,129 +54,155 @@ app = FastAPI(
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _method_dict(sym, level: int) -> dict:
-    d: dict = {"name": sym.name, "line": sym.line, "decorators": sym.decorators}
-    if level >= 2:
-        d["signature"] = sym.signature
-    return d
+def _graph_ready() -> GraphIndex:
+    graph: GraphIndex = app.state.graph
+    if not graph._loaded:
+        raise HTTPException(
+            status_code=503,
+            detail="Graph not yet built. Run 'codemapper2 build' first.",
+        )
+    return graph
 
 
-def _func_dict(sym, level: int) -> dict:
-    d: dict = {"name": sym.name, "line": sym.line, "decorators": sym.decorators}
-    if level >= 2:
-        d["signature"] = sym.signature
-    return d
-
-
-def _grouped_symbols(pf, level: int, include_variables: bool = False) -> dict:
-    classes_by_name: dict[str, dict] = {}
-    functions: list[dict] = []
-    constants: list[dict] = []
-    variables: list[dict] = []
-
-    for sym in pf.symbols:
-        if sym.kind == "class":
-            classes_by_name[sym.name] = {
-                "name": sym.name,
-                "line": sym.line,
-                "decorators": sym.decorators,
-                "methods": [],
-            }
-        elif sym.kind == "function":
-            functions.append(_func_dict(sym, level))
-        elif sym.kind == "constant":
-            constants.append({"name": sym.name, "line": sym.line})
-        elif sym.kind == "variable" and include_variables:
-            variables.append({"name": sym.name, "line": sym.line})
-
-    for sym in pf.symbols:
-        if sym.kind == "method" and sym.parent and sym.parent in classes_by_name:
-            classes_by_name[sym.parent]["methods"].append(_method_dict(sym, level))
-
-    result: dict = {}
-    if constants:
-        result["constants"] = constants
-    if include_variables and variables:
-        result["variables"] = variables
-    if functions:
-        result["functions"] = functions
-    if classes_by_name:
-        result["classes"] = list(classes_by_name.values())
-    return result
-
-
-def _file_response(pf, level: int) -> dict:
-    global_imports = [asdict(i) for i in pf.imports if i.scope is None]
-    scoped_imports = [asdict(i) for i in pf.imports if i.scope is not None]
-
-    result: dict = {
-        "path": pf.path,
-        "level": level,
-        "module_doc": pf.module_doc,
-        "imports": {
-            "global": global_imports,
-            "scoped": scoped_imports,
-        },
+def _node_dict(node) -> dict:
+    return {
+        "id": node.id,
+        "label": node.label,
+        "file_type": node.file_type,
+        "source_file": node.source_file,
+        "source_location": node.source_location,
+        "community": node.community,
+        "degree": node.degree,
+        "codemapper": node.codemapper,
     }
-    if level >= 1:
-        result["module_doc_full"] = pf.module_doc_full
-        result.update(_grouped_symbols(pf, level, include_variables=True))
-    return result
-
-
-def _map_entry(pf, level: int) -> dict:
-    entry: dict = {"module_doc": pf.module_doc}
-    if level >= 1:
-        entry.update(_grouped_symbols(pf, level, include_variables=False))
-    return entry
-
-
-def _doc_entry(doc, level: int) -> dict:
-    """Doc summary for /docs and the map's docs block. level 0 = kind only."""
-    if level < 1:
-        return {"kind": doc.kind}
-    entry: dict = {"kind": doc.kind}
-    if doc.top_keys:
-        entry["top_keys"] = doc.top_keys
-    if doc.headings:
-        entry["headings"] = doc.headings
-    if doc.wikilinks:
-        entry["wikilinks"] = doc.wikilinks
-    return entry
 
 
 # ---------------------------------------------------------------------------
-# Endpoints
+# Graph navigation endpoints
 # ---------------------------------------------------------------------------
 
-@app.get("/map")
-async def get_map(level: int = 0, include_docs: bool = False) -> dict:
+@app.get("/status")
+async def status() -> dict:
+    graph: GraphIndex = app.state.graph
+    if not graph._loaded:
+        return {"graph_ready": False, "root": str(app.state.root)}
+    return {
+        "graph_ready": True,
+        "root": str(app.state.root),
+        "nodes": graph.node_count(),
+        "communities": graph.community_count(),
+    }
+
+
+@app.get("/god_nodes")
+async def god_nodes(
+    n: int = 10,
+    stale_only: bool = False,
+    min_complexity: int | None = None,
+    dead_only: bool = False,
+) -> list[dict]:
+    graph = _graph_ready()
+    nodes = graph.get_god_nodes(n=n, stale_only=stale_only, min_complexity=min_complexity, dead_only=dead_only)
+    return [_node_dict(nd) for nd in nodes]
+
+
+@app.get("/community/{node_id:path}")
+async def community(node_id: str) -> dict:
+    graph = _graph_ready()
+    siblings = graph.get_community(node_id)
+    focal = graph.get_node(node_id)
+    return {
+        "node_id": node_id,
+        "community_id": focal.community if focal else None,
+        "members": [_node_dict(n) for n in siblings],
+    }
+
+
+@app.get("/neighbors/{node_id:path}")
+async def neighbors(node_id: str, relation: str | None = None) -> dict:
+    graph = _graph_ready()
+    out = graph.get_neighbors(node_id, relation=relation)
+    inc = graph.get_incoming(node_id, relation=relation)
+    return {
+        "node_id": node_id,
+        "outgoing": [{"relation": e.relation, "confidence": e.confidence, "node": _node_dict(n)} for e, n in out],
+        "incoming": [{"relation": e.relation, "confidence": e.confidence, "node": _node_dict(n)} for e, n in inc],
+    }
+
+
+@app.get("/explore")
+async def explore(q: str, budget: int = 2000) -> dict:
+    root: Path = app.state.root
+    try:
+        result = query(q, root, budget=budget)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    return {"query": q, "result": result}
+
+
+@app.get("/path")
+async def path_between(a: str, b: str) -> dict:
+    root: Path = app.state.root
+    try:
+        result = path_query(a, b, root)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    return {"from": a, "to": b, "result": result}
+
+
+@app.get("/find")
+async def find_nodes(label: str) -> list[dict]:
+    graph = _graph_ready()
+    return [_node_dict(n) for n in graph.find_by_label(label)]
+
+
+# ---------------------------------------------------------------------------
+# Diagnostic endpoints (Phase 1: CodeIndex bridge)
+# ---------------------------------------------------------------------------
+
+@app.get("/diagnose")
+async def diagnose(path: str | None = None, scope: str | None = None) -> dict:
     index: CodeIndex = app.state.index
-    files = {path: _map_entry(index.get_file(path), level) for path in index.all_files()}
-    result: dict = {"root": str(app.state.root), "level": level, "files": files}
-    if include_docs:
-        result["docs"] = {path: _doc_entry(index.get_doc(path), 0) for path in index.all_docs()}
+    root: Path = app.state.root
+    scope_list = [s.strip() for s in scope.split(",")] if scope else list(ANALYZERS)
+    result = analyze(index, root, scope=scope_list)
+
+    findings_out = []
+    for f in result.findings:
+        if path and f.path and path not in f.path:
+            continue
+        findings_out.append({
+            "rule": f.rule,
+            "severity": f.severity,
+            "path": f.path,
+            "line": f.line,
+            "symbol": f.symbol,
+            "message": f.message,
+            "introduced": f.introduced,
+            "actions": [asdict(a) for a in f.actions],
+        })
+
+    return {
+        "root": result.root,
+        "path_filter": path,
+        "scope": scope_list,
+        "score": result.score,
+        "summary": result.summary,
+        "findings": findings_out,
+    }
+
+
+@app.get("/python_sig")
+async def python_sig(path: str, symbol: str) -> dict:
+    from codemapper.python_depth import signature
+    result = signature(app.state.root, path, symbol)
+    if result is None:
+        raise HTTPException(status_code=404, detail=f"No Python symbol '{symbol}' in {path}")
     return result
-
-
-@app.get("/docfiles")
-async def get_docfiles(level: int = 0) -> dict:
-    index: CodeIndex = app.state.index
-    docs = {path: _doc_entry(index.get_doc(path), level) for path in index.all_docs()}
-    return {"root": str(app.state.root), "level": level, "docs": docs}
-
-
-@app.get("/doc/{path:path}")
-async def get_doc(path: str) -> dict:
-    index: CodeIndex = app.state.index
-    doc = index.get_doc(path)
-    if doc is None:
-        raise HTTPException(status_code=404, detail=f"Doc not found in index: {path}")
-    return asdict(doc)
 
 
 @app.get("/staleness")
-async def get_staleness() -> dict:
+async def staleness_report() -> dict:
     index: CodeIndex = app.state.index
     findings = analyze_staleness(app.state.root, index)
     return {
@@ -185,91 +213,13 @@ async def get_staleness() -> dict:
     }
 
 
-@app.get("/file/{path:path}")
-async def get_file(path: str, level: int = 0) -> dict:
-    index: CodeIndex = app.state.index
-    pf = index.get_file(path)
-    if pf is None:
-        raise HTTPException(status_code=404, detail=f"File not found in index: {path}")
-    return _file_response(pf, level)
-
-
-@app.get("/symbol/{name}")
-async def get_symbol(name: str) -> list[dict]:
-    index: CodeIndex = app.state.index
-    return [asdict(loc) for loc in index.find_symbol(name)]
-
-
-@app.get("/usages/{name}")
-async def get_usages(name: str) -> list[dict]:
-    index: CodeIndex = app.state.index
-    return [asdict(u) for u in index.find_usages(name)]
-
-
-@app.get("/imports/{module}")
-async def get_imports(module: str) -> list[str]:
-    index: CodeIndex = app.state.index
-    return index.find_imports(module)
-
-
-@app.get("/search")
-async def search(q: str) -> list[dict]:
-    index: CodeIndex = app.state.index
-    return [asdict(m) for m in index.search(q)]
-
-
-@app.get("/packages")
-async def get_packages() -> list[dict]:
-    index: CodeIndex = app.state.index
-    return [asdict(p) for p in index.packages()]
-
-
-@app.post("/session/new")
-async def new_session() -> dict:
-    index: CodeIndex = app.state.index
-    session_id = str(uuid.uuid4())
-    _sessions[session_id] = Session(index=index, session_id=session_id)
-    return {"session_id": session_id}
-
-
-@app.post("/session/{session_id}/expand")
-async def expand_session(session_id: str, body: ExpandRequest) -> dict:
-    session = _sessions.get(session_id)
-    if session is None:
-        raise HTTPException(status_code=404, detail=f"Session not found: {session_id}")
-    return session.expand(body.path, body.level)
-
-
-@app.get("/analyze")
-async def get_analyze(scope: str | None = None) -> dict:
-    index: CodeIndex = app.state.index
-    scope_list = [s.strip() for s in scope.split(",")] if scope else list(ANALYZERS)
-    result = analyze(index, app.state.root, scope=scope_list)
-    findings_out = []
-    for f in result.findings:
-        d = {
-            "rule": f.rule,
-            "severity": f.severity,
-            "path": f.path,
-            "line": f.line,
-            "symbol": f.symbol,
-            "message": f.message,
-            "introduced": f.introduced,
-            "actions": [asdict(a) for a in f.actions],
-            "metadata": f.metadata,
-        }
-        findings_out.append(d)
-    return {
-        "root": result.root,
-        "scope": result.scope,
-        "score": result.score,
-        "summary": result.summary,
-        "findings": findings_out,
-    }
-
-
 @app.post("/refresh")
 async def refresh() -> dict:
     index: CodeIndex = app.state.index
+    graph: GraphIndex = app.state.graph
     index.refresh()
-    return {"status": "ok", "files": len(index.all_files())}
+    try:
+        graph.load()
+    except FileNotFoundError:
+        pass
+    return {"status": "ok", "files": len(index.all_files()), "graph_nodes": graph.node_count()}

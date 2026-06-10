@@ -5,7 +5,6 @@ import json
 from dataclasses import dataclass, asdict
 from pathlib import Path
 
-from codemapper.docparser import DocFile, is_indexable_doc, parse_doc, parse_docs
 from codemapper.parser import ImportInfo, ParsedFile, Symbol, parse_repo
 
 
@@ -60,29 +59,15 @@ def _dict_to_pf(d: dict) -> ParsedFile:
     )
 
 
-def _dict_to_doc(d: dict) -> DocFile:
-    return DocFile(
-        path=d["path"],
-        kind=d["kind"],
-        top_keys=d.get("top_keys", []),
-        headings=d.get("headings", []),
-        wikilinks=d.get("wikilinks", []),
-    )
-
-
 class CodeIndex:
     def __init__(self, root: Path) -> None:
         self.root = root.resolve()
         self._files: dict[str, ParsedFile] = {}
         self._mtimes: dict[str, float] = {}
-        self._docs: dict[str, DocFile] = {}
-        self._doc_mtimes: dict[str, float] = {}
 
     def build(self) -> None:
         self._files = parse_repo(self.root)
         self._mtimes = self._current_mtimes()
-        self._docs = parse_docs(self.root)
-        self._doc_mtimes = self._current_doc_mtimes()
         self._save_cache()
 
     def refresh(self) -> None:
@@ -109,20 +94,6 @@ class CodeIndex:
             dirty = True
         self._mtimes = current
 
-        # --- Non-Python doc files (no cross-file deps → incremental) ---
-        current_docs = self._current_doc_mtimes()
-        stale_docs = [p for p, mt in current_docs.items() if self._doc_mtimes.get(p) != mt]
-        removed_docs = [p for p in list(self._docs) if p not in current_docs]
-
-        for path_key in removed_docs:
-            del self._docs[path_key]
-        for path_key in stale_docs:
-            doc = parse_doc(self.root / Path(path_key), self.root)
-            self._docs[doc.path] = doc
-        if removed_docs or stale_docs:
-            dirty = True
-        self._doc_mtimes = current_docs
-
         if dirty:
             self._save_cache()
 
@@ -131,12 +102,6 @@ class CodeIndex:
 
     def all_files(self) -> list[str]:
         return sorted(self._files.keys())
-
-    def get_doc(self, path: str) -> DocFile | None:
-        return self._docs.get(path)
-
-    def all_docs(self) -> list[str]:
-        return sorted(self._docs.keys())
 
     def find_symbol(self, name: str) -> list[SymbolLocation]:
         results: list[SymbolLocation] = []
@@ -245,26 +210,12 @@ class CodeIndex:
                 pass
         return mtimes
 
-    def _current_doc_mtimes(self) -> dict[str, float]:
-        mtimes: dict[str, float] = {}
-        for path in self.root.rglob("*"):
-            if not is_indexable_doc(path, self.root):
-                continue
-            key = path.relative_to(self.root).as_posix()
-            try:
-                mtimes[key] = path.stat().st_mtime
-            except OSError:
-                pass
-        return mtimes
-
     def _save_cache(self) -> None:
         cache = {
             "version": _CACHE_VERSION,
             "root": str(self.root),
             "mtimes": self._mtimes,
             "files": {k: _pf_to_dict(v) for k, v in self._files.items()},
-            "doc_mtimes": self._doc_mtimes,
-            "docs": {k: asdict(v) for k, v in self._docs.items()},
         }
         cache_path = self.root / _CACHE_FILE
         cache_path.write_text(json.dumps(cache, indent=2), encoding="utf-8")
@@ -285,6 +236,4 @@ class CodeIndex:
 
         self._mtimes = data.get("mtimes", {})
         self._files = {k: _dict_to_pf(v) for k, v in data.get("files", {}).items()}
-        self._doc_mtimes = data.get("doc_mtimes", {})
-        self._docs = {k: _dict_to_doc(v) for k, v in data.get("docs", {}).items()}
         return True

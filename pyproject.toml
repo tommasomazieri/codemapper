@@ -4,22 +4,26 @@ build-backend = "hatchling.build"
 
 [project]
 name = "codemapper"
-version = "0.1.0"
-description = "Middleware tool that maps a Python codebase for LLM agent consumption"
+version = "2.0.0"
+description = "Unified codebase intelligence tool: Graphify graph + codemapper diagnostics, served via MCP"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.111",
     "uvicorn[standard]>=0.30",
     "typer>=0.12",
     "rich>=13",
+    "graphifyy>=0.8",
+    "openai>=1.0",
+    "networkx>=3.0",
+    "mcp>=1.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8",
-    "httpx>=0.27",   # for FastAPI test client
-    "watchdog>=4",   # optional live index refresh
+    "httpx>=0.27",
+    "watchdog>=4",
 ]
 
 [project.scripts]
-codemapper = "codemapper.cli:app"
+codemapper2 = "codemapper.cli:app"

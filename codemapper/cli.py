@@ -1,388 +1,241 @@
+"""codemapper2 CLI -setup, build, serve (API or MCP), diagnose, god-nodes."""
+
 import json
+import os
 import sys
-from dataclasses import asdict
 from pathlib import Path
 from typing import Optional
 
 import typer
 from rich.console import Console
 from rich.table import Table
-from rich.tree import Tree
 
-from codemapper.index import CodeIndex
+from codemapper import graphify_runner
+from codemapper.graph_index import GraphIndex
 
-app = typer.Typer(help="codemapper — progressive-disclosure API for Python codebases.")
-session_app = typer.Typer(help="Session management commands.")
-app.add_typer(session_app, name="session")
-
+app = typer.Typer(help="codemapper2 -unified codebase graph + diagnostics for AI agents.")
 console = Console()
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+def _write_mcp_json(project: Path) -> None:
+    """Register the codemapper2 stdio MCP server in the project's .mcp.json."""
+    path = project / ".mcp.json"
+    data: dict = {}
+    if path.exists():
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if not isinstance(data, dict):
+                data = {}
+        except (json.JSONDecodeError, OSError):
+            data = {}
+    servers = data.setdefault("mcpServers", {})
+    servers["codemapper2"] = {
+        "command": sys.executable,           # the venv python running this setup
+        "args": ["-m", "codemapper.mcp_server"],
+        "env": {"CODEMAPPER_ROOT": str(project)},
+        "timeout": 600000,
+    }
+    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
-def _get_index(root: Path) -> CodeIndex:
-    index = CodeIndex(root)
-    if (root / ".codemapper_cache.json").exists():
-        index.refresh()
-    else:
-        index.build()
-    return index
+
+def _write_hook(project: Path) -> None:
+    """Install the PreToolUse hook in the project's .claude/settings.json.
+
+    Exec form (command + args) avoids shell-quoting issues with the spaced venv
+    python path. Idempotent: removes any prior codemapper2 hook before adding.
+    """
+    settings_dir = project / ".claude"
+    settings_dir.mkdir(parents=True, exist_ok=True)
+    path = settings_dir / "settings.json"
+    data: dict = {}
+    if path.exists():
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if not isinstance(data, dict):
+                data = {}
+        except (json.JSONDecodeError, OSError):
+            data = {}
+
+    hooks = data.setdefault("hooks", {})
+    pre = hooks.setdefault("PreToolUse", [])
+    # Drop any existing codemapper2 hook entries (idempotent re-run).
+    def _is_ours(entry: dict) -> bool:
+        for h in entry.get("hooks", []):
+            if "codemapper.hook" in (h.get("args") or []):
+                return True
+        return False
+    pre[:] = [e for e in pre if not _is_ours(e)]
+    pre.append({
+        "matcher": "Grep|Glob",
+        "hooks": [
+            {"type": "command", "command": sys.executable, "args": ["-m", "codemapper.hook"]}
+        ],
+    })
+    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
-def _client_get(url: str, path: str, params: dict | None = None) -> dict | list:
+@app.command()
+def setup(
+    path: Path = typer.Argument(Path("."), help="Target project to initialize."),
+    no_llm: bool = typer.Option(False, "--no-llm", help="Skip the LLM semantic pass."),
+    backend: Optional[str] = typer.Option(None, "--backend"),
+    skip_build: bool = typer.Option(False, "--skip-build", help="Wire config but don't build now."),
+) -> None:
+    """One-command init for a target repo: register the MCP server (.mcp.json),
+    install the PreToolUse hook (.claude/settings.json), and build the graph."""
+    from codemapper.annotator import annotate
+
+    project = path.resolve()
+    console.print(f"[cyan]Initializing codemapper2 for[/cyan] {project}")
+    _write_mcp_json(project)
+    console.print("  [green]OK[/green] .mcp.json -registered codemapper2 MCP server")
+    _write_hook(project)
+    console.print("  [green]OK[/green] .claude/settings.json -installed PreToolUse hook")
+
+    if skip_build:
+        console.print("[yellow]Skipped build[/yellow] (--skip-build). Run 'codemapper2 build' later.")
+        return
+
+    console.print("  building graph (graphify) ...")
+    graphify_runner.build(project, no_llm=no_llm, backend=backend)
+    _, counts = annotate(project)
+    g = GraphIndex(project)
+    g.load()
+    console.print(
+        f"  [green]OK[/green] {g.node_count()} nodes, {g.community_count()} communities; "
+        f"annotations: {counts}"
+    )
+    console.print("[bold green]Done.[/bold green] Restart Claude Code in this repo to load the MCP server.")
+
+
+@app.command()
+def build(
+    path: Path = typer.Argument(Path("."), help="Repo root to build."),
+    no_llm: bool = typer.Option(False, "--no-llm", help="Skip the LLM semantic pass (code-only)."),
+    backend: Optional[str] = typer.Option(None, "--backend", help="LLM backend (openrouter, ollama, ...)."),
+) -> None:
+    """Build the knowledge graph (graphify) and annotate it with diagnostics."""
+    from codemapper.annotator import annotate
+
+    root = path.resolve()
+    console.print(f"[cyan]1/2 Building graph for[/cyan] {root} ...")
+    graphify_runner.build(root, no_llm=no_llm, backend=backend)
+    console.print("[cyan]2/2 Annotating with codemapper diagnostics ...[/cyan]")
     try:
-        import httpx
-    except ImportError:
-        typer.echo("httpx is required for client mode: pip install httpx", err=True)
+        _, counts = annotate(root)
+        g = GraphIndex(root)
+        g.load()
+        console.print(
+            f"[green]OK[/green] {g.node_count()} nodes, {g.community_count()} communities; "
+            f"annotations: {counts}"
+        )
+    except FileNotFoundError as exc:
+        console.print(f"[red]FAIL[/red] {exc}")
         raise typer.Exit(1)
-    full_url = url.rstrip("/") + "/" + path.lstrip("/")
-    r = httpx.get(full_url, params=params, timeout=10)
-    r.raise_for_status()
-    return r.json()
 
-
-def _client_post(url: str, path: str, data: dict | None = None) -> dict | list:
-    try:
-        import httpx
-    except ImportError:
-        typer.echo("httpx is required for client mode: pip install httpx", err=True)
-        raise typer.Exit(1)
-    full_url = url.rstrip("/") + "/" + path.lstrip("/")
-    r = httpx.post(full_url, json=data, timeout=10)
-    r.raise_for_status()
-    return r.json()
-
-
-def _out(data, json_output: bool) -> None:
-    if json_output:
-        typer.echo(json.dumps(data, indent=2))
-    else:
-        console.print(data)
-
-
-# ---------------------------------------------------------------------------
-# Commands
-# ---------------------------------------------------------------------------
 
 @app.command()
 def serve(
-    port: int = typer.Option(8000, "--port", help="Port to listen on."),
-    root: Path = typer.Option(Path("."), "--root", help="Repo root to index."),
+    mcp: bool = typer.Option(False, "--mcp", help="Start the MCP stdio server instead of the HTTP API."),
+    port: int = typer.Option(8000, "--port", help="Port for the HTTP API."),
+    root: Path = typer.Option(Path("."), "--root", help="Repo root to serve."),
 ) -> None:
-    """Start the codemapper API server."""
-    import os
+    """Start the codemapper2 server -HTTP API (default) or MCP stdio (--mcp)."""
     os.environ["CODEMAPPER_ROOT"] = str(root.resolve())
+    if mcp:
+        from codemapper.mcp_server import main as mcp_main
+        mcp_main()
+        return
     try:
         import uvicorn
     except ImportError:
         typer.echo("uvicorn is required: pip install uvicorn", err=True)
         raise typer.Exit(1)
-    uvicorn.run("codemapper.api:app", host="0.0.0.0", port=port, reload=False)
+    uvicorn.run("codemapper.api:app", host="127.0.0.1", port=port, reload=False)
 
 
 @app.command()
-def map(
-    level: int = typer.Option(0, "--level", help="Detail level (0-2)."),
-    root: Path = typer.Option(Path("."), "--root", help="Repo root to index."),
-    json_output: bool = typer.Option(False, "--json", help="Machine-readable JSON output."),
-    url: Optional[str] = typer.Option(None, "--url", help="URL of running server (client mode)."),
+def diagnose(
+    path: Optional[str] = typer.Argument(None, help="File path fragment to restrict findings."),
+    root: Path = typer.Option(Path("."), "--root"),
+    scope: Optional[str] = typer.Option(None, "--scope", help="dead,complexity,deps (default all)."),
+    json_output: bool = typer.Option(False, "--json"),
 ) -> None:
-    """Print a repo map at the given detail level."""
-    if url:
-        data = _client_get(url, "/map", {"level": level})
-        _out(data, json_output)
-        return
+    """Run deterministic diagnostics: dead code, complexity, dep hygiene, staleness."""
+    from codemapper.analysis import ANALYZERS, analyze
+    from codemapper.index import CodeIndex
 
-    index = _get_index(root.resolve())
-    files_out: dict = {}
-    for path_key in index.all_files():
-        pf = index.get_file(path_key)
-        entry: dict = {"module_doc": pf.module_doc}
-        if level >= 1:
-            syms = []
-            for s in pf.symbols:
-                sd: dict = {"name": s.name, "kind": s.kind, "line": s.line}
-                if level >= 2:
-                    sd["signature"] = s.signature
-                    sd["parent"] = s.parent
-                syms.append(sd)
-            entry["symbols"] = syms
-        files_out[path_key] = entry
+    r = root.resolve()
+    index = CodeIndex(r)
+    index.build()
+    scope_list = [s.strip() for s in scope.split(",")] if scope else list(ANALYZERS)
+    result = analyze(index, r, scope=scope_list)
 
-    data = {"root": str(root.resolve()), "level": level, "files": files_out}
+    findings = [
+        f for f in result.findings
+        if not path or (f.path and path in f.path)
+    ]
 
     if json_output:
-        typer.echo(json.dumps(data, indent=2))
+        typer.echo(json.dumps({
+            "score": result.score,
+            "summary": result.summary,
+            "findings": [
+                {"rule": f.rule, "severity": f.severity, "path": f.path,
+                 "line": f.line, "symbol": f.symbol, "message": f.message}
+                for f in findings
+            ],
+        }, indent=2))
         return
 
-    tree = Tree(f"[bold]{root.resolve()}[/bold]  (level {level})")
-    for fpath, fdata in files_out.items():
-        branch = tree.add(f"[cyan]{fpath}[/cyan]  {fdata.get('module_doc') or ''}")
-        for sym in fdata.get("symbols", []):
-            sig = sym.get("signature") or sym["name"]
-            branch.add(f"[green]{sym['kind']}[/green] {sig}  :[dim]{sym['line']}[/dim]")
-    console.print(tree)
+    console.print(f"[bold]Health score:[/bold] {result.score}/100")
+    if not findings:
+        console.print("[green]No findings.[/green]")
+        return
+    tbl = Table("rule", "severity", "path", "line", "symbol", "message")
+    for f in findings:
+        tbl.add_row(f.rule, f.severity, f.path or "", str(f.line or ""), f.symbol or "", f.message or "")
+    console.print(tbl)
 
 
-@app.command()
-def inspect(
-    path: str = typer.Argument(..., help="File path relative to root."),
-    level: int = typer.Option(1, "--level", help="Detail level (0-2)."),
-    root: Path = typer.Option(Path("."), "--root", help="Repo root."),
+@app.command(name="god-nodes")
+def god_nodes(
+    n: int = typer.Option(10, "--n", help="How many nodes."),
+    stale: bool = typer.Option(False, "--stale", help="Only nodes with stale docstrings."),
+    min_complexity: Optional[int] = typer.Option(None, "--min-complexity"),
+    dead: bool = typer.Option(False, "--dead", help="Only dead-code nodes."),
+    root: Path = typer.Option(Path("."), "--root"),
     json_output: bool = typer.Option(False, "--json"),
-    url: Optional[str] = typer.Option(None, "--url"),
 ) -> None:
-    """Show detail for a single file."""
-    if url:
-        data = _client_get(url, f"/file/{path}", {"level": level})
-        _out(data, json_output)
-        return
-
-    index = _get_index(root.resolve())
-    pf = index.get_file(path)
-    if pf is None:
-        typer.echo(f"File not found in index: {path}", err=True)
+    """List the most architecturally central files, filterable by quality signals."""
+    g = GraphIndex(root.resolve())
+    try:
+        g.load()
+    except FileNotFoundError as exc:
+        console.print(f"[red]FAIL[/red] {exc}")
         raise typer.Exit(1)
 
-    syms = []
-    for s in pf.symbols:
-        sd: dict = {"name": s.name, "kind": s.kind, "line": s.line}
-        if level >= 2:
-            sd["signature"] = s.signature
-            sd["parent"] = s.parent
-        syms.append(sd)
-
-    data = {
-        "path": pf.path,
-        "level": level,
-        "module_doc": pf.module_doc,
-        "imports": [asdict(i) for i in pf.imports],
-        "symbols": syms if level >= 1 else [],
-    }
+    nodes = g.get_god_nodes(n=n, stale_only=stale, min_complexity=min_complexity, dead_only=dead)
 
     if json_output:
-        typer.echo(json.dumps(data, indent=2))
+        typer.echo(json.dumps([
+            {"id": x.id, "label": x.label, "source_file": x.source_file,
+             "source_location": x.source_location, "degree": x.degree,
+             "codemapper": x.codemapper}
+            for x in nodes
+        ], indent=2))
         return
 
-    console.print(f"[bold]{pf.path}[/bold]  (level {level})")
-    if pf.module_doc:
-        console.print(f"[italic]{pf.module_doc}[/italic]")
-    if data["imports"]:
-        tbl = Table("module", "alias", "kind", "line", title="Imports")
-        for imp in data["imports"]:
-            tbl.add_row(imp["module"], imp["alias"] or "", imp["kind"], str(imp["line"]))
-        console.print(tbl)
-    if data["symbols"]:
-        tbl = Table("name", "kind", "line", *(["signature"] if level >= 2 else []), title="Symbols")
-        for sym in data["symbols"]:
-            row = [sym["name"], sym["kind"], str(sym["line"])]
-            if level >= 2:
-                row.append(sym.get("signature") or "")
-            tbl.add_row(*row)
-        console.print(tbl)
-
-
-@app.command()
-def find(
-    symbol: str = typer.Argument(..., help="Symbol name to locate."),
-    root: Path = typer.Option(Path("."), "--root"),
-    json_output: bool = typer.Option(False, "--json"),
-    url: Optional[str] = typer.Option(None, "--url"),
-) -> None:
-    """Find where a symbol is defined."""
-    if url:
-        data = _client_get(url, f"/symbol/{symbol}")
-        _out(data, json_output)
-        return
-
-    index = _get_index(root.resolve())
-    results = [asdict(loc) for loc in index.find_symbol(symbol)]
-
-    if json_output:
-        typer.echo(json.dumps(results, indent=2))
-        return
-
-    if not results:
-        console.print(f"[yellow]No definition found for '{symbol}'[/yellow]")
-        return
-    tbl = Table("file", "kind", "line", "parent", title=f"Definition: {symbol}")
-    for r in results:
-        tbl.add_row(r["file"], r["kind"], str(r["line"]), r["parent"] or "")
+    tbl = Table("label", "source_file", "degree", "complexity", "stale", "dead")
+    for x in nodes:
+        cm = x.codemapper
+        tbl.add_row(
+            x.label, x.source_file, str(x.degree),
+            str(cm.get("complexity", "")), str(cm.get("stale_docstring", "")),
+            str(cm.get("dead", "")),
+        )
     console.print(tbl)
 
 
-@app.command()
-def usages(
-    symbol: str = typer.Argument(..., help="Symbol name to find usages of."),
-    root: Path = typer.Option(Path("."), "--root"),
-    json_output: bool = typer.Option(False, "--json"),
-    url: Optional[str] = typer.Option(None, "--url"),
-) -> None:
-    """Find all usages of a symbol."""
-    if url:
-        data = _client_get(url, f"/usages/{symbol}")
-        _out(data, json_output)
-        return
-
-    index = _get_index(root.resolve())
-    results = [asdict(u) for u in index.find_usages(symbol)]
-
-    if json_output:
-        typer.echo(json.dumps(results, indent=2))
-        return
-
-    if not results:
-        console.print(f"[yellow]No usages found for '{symbol}'[/yellow]")
-        return
-    tbl = Table("file", "line", "context", title=f"Usages: {symbol}")
-    for r in results:
-        tbl.add_row(r["file"], str(r["line"]), r["context"])
-    console.print(tbl)
-
-
-@app.command(name="imports")
-def imports_cmd(
-    module: str = typer.Argument(..., help="Module name to search imports for."),
-    root: Path = typer.Option(Path("."), "--root"),
-    json_output: bool = typer.Option(False, "--json"),
-    url: Optional[str] = typer.Option(None, "--url"),
-) -> None:
-    """List files that import a module."""
-    if url:
-        data = _client_get(url, f"/imports/{module}")
-        _out(data, json_output)
-        return
-
-    index = _get_index(root.resolve())
-    results = index.find_imports(module)
-
-    if json_output:
-        typer.echo(json.dumps(results, indent=2))
-        return
-
-    if not results:
-        console.print(f"[yellow]No files import '{module}'[/yellow]")
-        return
-    for f in results:
-        console.print(f)
-
-
-@app.command()
-def search(
-    query: str = typer.Argument(..., help="Search query (case-insensitive substring)."),
-    root: Path = typer.Option(Path("."), "--root"),
-    json_output: bool = typer.Option(False, "--json"),
-    url: Optional[str] = typer.Option(None, "--url"),
-) -> None:
-    """Fuzzy-search symbols by name."""
-    if url:
-        data = _client_get(url, "/search", {"q": query})
-        _out(data, json_output)
-        return
-
-    index = _get_index(root.resolve())
-    results = [asdict(m) for m in index.search(query)]
-
-    if json_output:
-        typer.echo(json.dumps(results, indent=2))
-        return
-
-    if not results:
-        console.print(f"[yellow]No symbols matching '{query}'[/yellow]")
-        return
-    tbl = Table("file", "name", "kind", "line", title=f"Search: {query}")
-    for r in results:
-        tbl.add_row(r["file"], r["name"], r["kind"], str(r["line"]))
-    console.print(tbl)
-
-
-@app.command()
-def packages(
-    root: Path = typer.Option(Path("."), "--root"),
-    json_output: bool = typer.Option(False, "--json"),
-    url: Optional[str] = typer.Option(None, "--url"),
-) -> None:
-    """List installed packages and which indexed files use them."""
-    if url:
-        data = _client_get(url, "/packages")
-        _out(data, json_output)
-        return
-
-    index = _get_index(root.resolve())
-    results = [asdict(p) for p in index.packages()]
-
-    if json_output:
-        typer.echo(json.dumps(results, indent=2))
-        return
-
-    tbl = Table("name", "version", "used_in", title="Packages")
-    for p in results:
-        tbl.add_row(p["name"], p["version"], ", ".join(p["used_in"]))
-    console.print(tbl)
-
-
-# ---------------------------------------------------------------------------
-# Session subcommands
-# ---------------------------------------------------------------------------
-
-@session_app.command("new")
-def session_new(
-    save: Optional[Path] = typer.Option(None, "--save", help="Path to persist session state."),
-    url: Optional[str] = typer.Option(None, "--url"),
-) -> None:
-    """Create a new progressive-disclosure session."""
-    if url:
-        data = _client_post(url, "/session/new")
-        typer.echo(json.dumps(data, indent=2))
-        return
-
-    import uuid
-    from codemapper.session import Session
-    # In standalone mode, just generate an ID and optionally save state
-    root = Path(".").resolve()
-    index = _get_index(root)
-    session_id = str(uuid.uuid4())
-    session = Session(index=index, session_id=session_id, save_path=save)
-    if save:
-        session._persist()
-    typer.echo(json.dumps({"session_id": session_id}, indent=2))
-
-
-@session_app.command("expand")
-def session_expand(
-    path: str = typer.Argument(..., help="File path to expand."),
-    level: int = typer.Option(1, "--level"),
-    session_file: Optional[Path] = typer.Option(None, "--session", help="Saved session file."),
-    root: Path = typer.Option(Path("."), "--root"),
-    json_output: bool = typer.Option(False, "--json"),
-    url: Optional[str] = typer.Option(None, "--url"),
-    session_id_opt: Optional[str] = typer.Option(None, "--session-id"),
-) -> None:
-    """Expand a file within a session (returns delta only)."""
-    if url:
-        if not session_id_opt:
-            typer.echo("--session-id is required in client mode", err=True)
-            raise typer.Exit(1)
-        data = _client_post(url, f"/session/{session_id_opt}/expand", {"path": path, "level": level})
-        _out(data, json_output)
-        return
-
-    import json as _json
-    import uuid
-    from codemapper.session import Session
-
-    index = _get_index(root.resolve())
-
-    if session_file and session_file.exists():
-        saved = _json.loads(session_file.read_text())
-        session_id = saved["session_id"]
-        session = Session(index=index, session_id=session_id, save_path=session_file)
-        session._seen = saved.get("seen", {})
-    else:
-        session_id = session_id_opt or str(uuid.uuid4())
-        session = Session(index=index, session_id=session_id, save_path=session_file)
-
-    result = session.expand(path, level)
-    _out(result, json_output)
+if __name__ == "__main__":
+    app()
