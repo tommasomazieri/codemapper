@@ -44,31 +44,34 @@ def _graph() -> GraphIndex:
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
-def build(no_llm: bool = False, backend: str | None = None) -> str:
-    """Build (or rebuild) the codebase knowledge graph and annotate it with
-    codemapper diagnostics. Run this once per project before querying.
+def build(no_llm: bool = True, backend: str | None = None) -> str:
+    """Rebuild the codebase knowledge graph in the background (non-blocking).
+
+    ALWAYS call with no_llm=True (the default). The LLM semantic pass takes
+    10+ minutes on the free OpenRouter tier and will time out the MCP call.
+    The AST-only rebuild completes in under 60 seconds.
 
     Args:
-        no_llm: Skip the LLM semantic pass (code-only graph, fully offline).
-        backend: LLM backend override (e.g. 'openrouter', 'ollama').
+        no_llm: Skip the LLM semantic pass. Default True — do not change.
+        backend: LLM backend override (only relevant when no_llm=False).
     """
-    from codemapper.annotator import annotate
+    import subprocess
+    import sys
 
     root = _root()
     _log_mcp(root, "build", no_llm=no_llm)
-    graphify_runner.build(root, no_llm=no_llm, backend=backend)
-    try:
-        _, counts = annotate(root)
-        g = GraphIndex(root)
-        g.load()
-        return json.dumps({
-            "status": "ok",
-            "nodes": g.node_count(),
-            "communities": g.community_count(),
-            "annotations": counts,
-        })
-    except FileNotFoundError as exc:
-        return json.dumps({"status": "error", "detail": str(exc)})
+    cmd = [sys.executable, "-m", "codemapper.cli", "build", str(root)]
+    if no_llm:
+        cmd.append("--no-llm")
+    if backend:
+        cmd.extend(["--backend", backend])
+    subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    mode = "AST-only" if no_llm else "full LLM"
+    return json.dumps({
+        "status": "started",
+        "mode": mode,
+        "note": f"{mode} build running in background. Wait ~30-60s then query normally.",
+    })
 
 
 # ---------------------------------------------------------------------------
