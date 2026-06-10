@@ -62,11 +62,10 @@ def main() -> None:
             record["cmd_snippet"] = command[:80]
         _log(cwd, record)
         sys.exit(0)
-    record = {"event": "hook", "tool": tool_name, "decision": "block"}
+    record = {"event": "hook", "tool": tool_name, "decision": "nav_pattern"}
     if command:
         record["cmd_snippet"] = command[:80]
     _log(cwd, record)
-    print(json.dumps({"decision": "block", "reason": BLOCK_REASON}))
     sys.exit(0)
 
 

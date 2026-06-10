@@ -17,6 +17,47 @@ app = typer.Typer(help="codemapper2 -unified codebase graph + diagnostics for AI
 console = Console()
 
 
+def _write_hook(project: Path) -> None:
+    """Install the logging-only PreToolUse hook in .claude/settings.json.
+
+    Fires on Grep|Glob|Bash — logs every tool call to graphify-out/mcp_usage.jsonl
+    for observability. Never blocks. Idempotent: removes prior codemapper2 entry first.
+    """
+    settings_dir = project / ".claude"
+    settings_dir.mkdir(parents=True, exist_ok=True)
+    path = settings_dir / "settings.json"
+    data: dict = {}
+    if path.exists():
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if not isinstance(data, dict):
+                data = {}
+        except (json.JSONDecodeError, OSError):
+            data = {}
+
+    hooks = data.setdefault("hooks", {})
+    pre = hooks.setdefault("PreToolUse", [])
+
+    def _is_ours(entry: dict) -> bool:
+        for h in entry.get("hooks", []):
+            if "codemapper.hook" in (h.get("args") or []):
+                return True
+        return False
+    pre[:] = [e for e in pre if not _is_ours(e)]
+    pre.append({
+        "matcher": "Grep|Glob|Bash",
+        "hooks": [
+            {
+                "type": "command",
+                "command": sys.executable,
+                "args": ["-m", "codemapper.hook"],
+                "timeout": 5000,
+            }
+        ],
+    })
+    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+
 def _write_mcp_json(project: Path) -> None:
     """Register the codemapper2 stdio MCP server in the project's .mcp.json."""
     path = project / ".mcp.json"
@@ -54,6 +95,8 @@ def setup(
     console.print(f"[cyan]Initializing codemapper2 for[/cyan] {project}")
     _write_mcp_json(project)
     console.print("  [green]OK[/green] .mcp.json -registered codemapper2 MCP server")
+    _write_hook(project)
+    console.print("  [green]OK[/green] .claude/settings.json -installed logging hook (Grep|Glob|Bash)")
 
     if skip_build:
         console.print("[yellow]Skipped build[/yellow] (--skip-build). Run 'codemapper2 build' later.")
