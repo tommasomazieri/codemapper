@@ -66,7 +66,7 @@ def _write_hook(project: Path) -> None:
         return False
     pre[:] = [e for e in pre if not _is_ours(e)]
     pre.append({
-        "matcher": "Grep|Glob",
+        "matcher": "Grep|Glob|Bash",
         "hooks": [
             {
                 "type": "command",

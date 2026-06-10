@@ -7,6 +7,7 @@ inert in repos that haven't run setup.
 """
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -22,6 +23,15 @@ BLOCK_REASON = (
     "Call build() first if the graph is stale."
 )
 
+NAV_PATTERNS = re.compile(r'\b(grep|rg|find|cat|head|tail|sed|awk)\b')
+
+
+def should_block(tool_name: str, tool_input: dict) -> bool:
+    if tool_name == "Bash":
+        command = tool_input.get("command", "")
+        return bool(NAV_PATTERNS.search(command))
+    return True
+
 
 def main() -> None:
     try:
@@ -30,6 +40,10 @@ def main() -> None:
         sys.exit(0)
     cwd = Path(payload.get("cwd") or ".")
     if not (cwd / "graphify-out" / "graph_annotated.json").exists():
+        sys.exit(0)
+    tool_name = payload.get("tool_name", "")
+    tool_input = payload.get("tool_input", {})
+    if not should_block(tool_name, tool_input):
         sys.exit(0)
     print(json.dumps({"decision": "block", "reason": BLOCK_REASON}))
     sys.exit(0)

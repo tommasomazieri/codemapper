@@ -76,3 +76,10 @@ Phase 1 (core restructure) + Phase 2 (annotator, graph schema) + Python depth +
 servers + setup wiring are done and validated against `../geneticmon`. Deferred:
 adapting `deadcode.py`/`deps.py` to traverse graph edges for multi-language
 diagnostics (the Python AST analyzers already work and annotate correctly).
+
+## Code navigation rule
+
+For any code exploration, search, or navigation, use the codemapper2 MCP tools
+(`explore`, `god_nodes`, `neighbors`, `community`, `path_between`, `diagnose`, `python_sig`).
+Do NOT use Bash grep/find/cat/rg or Read to explore code structure. Read is only
+acceptable for a specific already-known file path needed directly.
