@@ -1,0 +1,1982 @@
+{
+  ".claude/hooks/data_write_guard.py": {
+    "mtime": 1781046851.6807144,
+    "ast_hash": "699f21d5abbb83f80f44033e7aa418c9",
+    "semantic_hash": ""
+  },
+  ".claude/hooks/file_size_check.py": {
+    "mtime": 1780920488.8747988,
+    "ast_hash": "d14aab125df3bd49c9755674213f3d3b",
+    "semantic_hash": ""
+  },
+  ".claude/hooks/game_dev_qa_lint.py": {
+    "mtime": 1780920474.0247698,
+    "ast_hash": "d8a9101284c148f9936fd85cdb6ee24f",
+    "semantic_hash": ""
+  },
+  ".claude/hooks/session_end.py": {
+    "mtime": 1780920456.2960205,
+    "ast_hash": "6cdfc8e8edacf64425207620682b2f0a",
+    "semantic_hash": ""
+  },
+  ".claude/hooks/session_start.py": {
+    "mtime": 1780920309.5026598,
+    "ast_hash": "592573070ec71f729e7a9a442acf5871",
+    "semantic_hash": ""
+  },
+  ".claude/settings.json": {
+    "mtime": 1781103916.1016474,
+    "ast_hash": "50aa26690fe3545e938c6a39621c917a",
+    "semantic_hash": ""
+  },
+  ".claude/settings.local.json": {
+    "mtime": 1781100162.3259852,
+    "ast_hash": "264415a5ff975f5d3c986807c4d59d86",
+    "semantic_hash": ""
+  },
+  ".codemapper_cache.json": {
+    "mtime": 1781109698.7234423,
+    "ast_hash": "09670efd3bc8a90a80786d25b73f7e2c",
+    "semantic_hash": ""
+  },
+  ".mcp.json": {
+    "mtime": 1781103916.100144,
+    "ast_hash": "1935d0c503d8623a822a215d3bb2b5e4",
+    "semantic_hash": ""
+  },
+  "blender_scripts/terrain_shader_builder.py": {
+    "mtime": 1781041338.4411526,
+    "ast_hash": "a3252bdc68b82d6f865edaf00fe0ddcb",
+    "semantic_hash": ""
+  },
+  "data/common/age_classes/00_reference.json": {
+    "mtime": 1781020135.831542,
+    "ast_hash": "cbb60e8b1ea21c52b7cd86fbcb4c5103",
+    "semantic_hash": ""
+  },
+  "data/common/age_classes/adult.json": {
+    "mtime": 1781002316.7032032,
+    "ast_hash": "7042d746c734ffe0c27756ac22838814",
+    "semantic_hash": ""
+  },
+  "data/common/age_classes/baby.json": {
+    "mtime": 1781002314.1191127,
+    "ast_hash": "ea9703ba4dbd481b5a566fc13789d526",
+    "semantic_hash": ""
+  },
+  "data/common/age_classes/juvenile.json": {
+    "mtime": 1781018958.9511194,
+    "ast_hash": "ad830837330d8b4e6b4635ef79c8e67b",
+    "semantic_hash": ""
+  },
+  "data/common/attitudes/00_reference.json": {
+    "mtime": 1781020136.7911727,
+    "ast_hash": "89c01d371c796a8791653c683d18482d",
+    "semantic_hash": ""
+  },
+  "data/common/attitudes/aggressive.json": {
+    "mtime": 1781018065.6775367,
+    "ast_hash": "50f8be6dbe4e4c53d83a6575c00f82c4",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/00_reference.json": {
+    "mtime": 1781037966.5915565,
+    "ast_hash": "dad34d1bff411690afc582cf1e8ec7a8",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/acid_resistance.json": {
+    "mtime": 1781038241.0112655,
+    "ast_hash": "da5d2d15b07f091544b8ff51235f8784",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/acid_secretion.json": {
+    "mtime": 1781038241.0123067,
+    "ast_hash": "f808a70c347536c892d15fda222eb068",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/acid_spray.json": {
+    "mtime": 1781038241.012815,
+    "ast_hash": "4e210417a374b193c54beebe6cf28f9e",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/aquatic_locomotion.json": {
+    "mtime": 1781038241.012815,
+    "ast_hash": "087244ab4823e6105e5530e527d628e3",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/armored_hide.json": {
+    "mtime": 1781038241.0138237,
+    "ast_hash": "3a53c9f86a5e9bd9a07bc723132e6582",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/bioluminescent_glow.json": {
+    "mtime": 1781038241.0138237,
+    "ast_hash": "3b4e72c6c8fca2c6e08d6658908e643f",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/burrowing.json": {
+    "mtime": 1781038241.0138237,
+    "ast_hash": "3884b2a74dccf52f177f3111bab22c4e",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/cavitation_blast.json": {
+    "mtime": 1781038241.01483,
+    "ast_hash": "652a58da6251c7565108d97f1fc0aff0",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/climbing.json": {
+    "mtime": 1781038241.01483,
+    "ast_hash": "a42a409c52a20e4acb126e813852c5a4",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/combustion.json": {
+    "mtime": 1781038241.01483,
+    "ast_hash": "e93451f054272be0fa82cff831ee8022",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/echolocation.json": {
+    "mtime": 1781038241.01583,
+    "ast_hash": "63e3614542bee7b77fb0fd7fce54216a",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/electric_jolt.json": {
+    "mtime": 1781038241.01583,
+    "ast_hash": "61d747c85bda035cdb49df12d8ba128e",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/electric_resistance.json": {
+    "mtime": 1781038241.01583,
+    "ast_hash": "94a96508416fc981c29004ab293ac0ef",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/electroreception.json": {
+    "mtime": 1781038241.01583,
+    "ast_hash": "e78dcb3b4bf81181e2b182dff5656388",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/enhanced_olfaction.json": {
+    "mtime": 1781038241.0173328,
+    "ast_hash": "f52bf51061de9d2ba4c1789228786fbb",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/flight.json": {
+    "mtime": 1781038241.0173328,
+    "ast_hash": "fb54d5f172d623c11d5026975ad562f0",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/gliding.json": {
+    "mtime": 1781038241.0183363,
+    "ast_hash": "8ea867150b41fde75062f5eeef62de8a",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/infrasound_projection.json": {
+    "mtime": 1781038241.0183363,
+    "ast_hash": "eabd3763e4c6682bbdbaa58274d3f08a",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/intense_bioluminescence.json": {
+    "mtime": 1781038241.0190873,
+    "ast_hash": "cc64622f3e7adef265057192157528a2",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/magnetic_disruption.json": {
+    "mtime": 1781038241.0190873,
+    "ast_hash": "9c60988b4e4685ba94d4628e94c1be38",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/magnetic_pulse.json": {
+    "mtime": 1781038241.0200908,
+    "ast_hash": "55bef749a59a7a07fac0905e68d94c08",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/magnetoreception.json": {
+    "mtime": 1781038241.0200908,
+    "ast_hash": "43c5cb9eb29c2d000192bef5da774098",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/photic_camouflage.json": {
+    "mtime": 1781038241.021091,
+    "ast_hash": "e7cb537259c79858778ab497434e6c50",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/pressure_resistance.json": {
+    "mtime": 1781038241.021091,
+    "ast_hash": "9154a89cb1cbeb6c7a96c876a01fe0d7",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/regeneration.json": {
+    "mtime": 1781037975.4438083,
+    "ast_hash": "c4425becccd957b7f7f240428d2432d4",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/sonic_burst.json": {
+    "mtime": 1781038241.0220926,
+    "ast_hash": "13dafab0293c2c023a38c2f27851dc3b",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/static_discharge.json": {
+    "mtime": 1781038040.1351707,
+    "ast_hash": "e50d5e89b1763afe06617f93d4d834e0",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/thermal_generation.json": {
+    "mtime": 1781038241.0220926,
+    "ast_hash": "6773a6e1519d7bd947e6bb76816d1d8d",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/thermal_resistance.json": {
+    "mtime": 1781038241.0220926,
+    "ast_hash": "5c911d95a4d995bf8982de7cbf96d155",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/thermal_scales.json": {
+    "mtime": 1781038038.1374464,
+    "ast_hash": "7be500c300e480fe90b2ce3be0edc14f",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/thermal_sensing.json": {
+    "mtime": 1781038241.0230913,
+    "ast_hash": "b65bace97272c23b25e69e63c7499afb",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/toxin_immunity.json": {
+    "mtime": 1781038241.0230913,
+    "ast_hash": "96e9d4661c30da2bc51a560baae58f5c",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/venom_injection.json": {
+    "mtime": 1781037977.5942476,
+    "ast_hash": "24c7dee0ff4a8fd883752952a5eb8e76",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/venom_secretion.json": {
+    "mtime": 1781038241.0230913,
+    "ast_hash": "1156ce5e5fe4f44256c530fe93f40b67",
+    "semantic_hash": ""
+  },
+  "data/common/capabilities/water_jet.json": {
+    "mtime": 1781038241.024594,
+    "ast_hash": "9ef1f3be3cb4c26384708b79ebdeeb48",
+    "semantic_hash": ""
+  },
+  "data/common/elements/00_reference.json": {
+    "mtime": 1781020138.9066205,
+    "ast_hash": "7511c806722217cf094364d0581a26a8",
+    "semantic_hash": ""
+  },
+  "data/common/elements/bioluminescent.json": {
+    "mtime": 1781002293.13154,
+    "ast_hash": "c98be252e9f9b4f9193c4aba217a4cd6",
+    "semantic_hash": ""
+  },
+  "data/common/elements/corrosive.json": {
+    "mtime": 1781002292.0568578,
+    "ast_hash": "b7265feadd2c0b752424005b34e5bcfd",
+    "semantic_hash": ""
+  },
+  "data/common/elements/electrical.json": {
+    "mtime": 1781002289.3509574,
+    "ast_hash": "359b27c20393984a2bed5738b01b72c7",
+    "semantic_hash": ""
+  },
+  "data/common/elements/hydraulic.json": {
+    "mtime": 1781002294.1598494,
+    "ast_hash": "6df51864560b68e9599a7116531ca0b7",
+    "semantic_hash": ""
+  },
+  "data/common/elements/magnetic.json": {
+    "mtime": 1781002294.775731,
+    "ast_hash": "e632306b656e8ecb3ffc9f5125fc56c6",
+    "semantic_hash": ""
+  },
+  "data/common/elements/sonic.json": {
+    "mtime": 1780942260.7745602,
+    "ast_hash": "48a2b1159cc46a0860f451e67e780c2f",
+    "semantic_hash": ""
+  },
+  "data/common/elements/thermal.json": {
+    "mtime": 1780942259.4322822,
+    "ast_hash": "858a78c98371f1773550778ab95b8938",
+    "semantic_hash": ""
+  },
+  "data/common/elements/toxin.json": {
+    "mtime": 1781002290.4737847,
+    "ast_hash": "192926d329e1cf0e3a6bcdf9f35c0404",
+    "semantic_hash": ""
+  },
+  "data/common/factions/00_reference.json": {
+    "mtime": 1781020139.8789635,
+    "ast_hash": "740de768ef8dfbabadb8d8cb39e9929c",
+    "semantic_hash": ""
+  },
+  "data/common/hybrids/00_reference.json": {
+    "mtime": 1781046860.2046115,
+    "ast_hash": "b90cd7f472c6449d0c842962b4bf4bb0",
+    "semantic_hash": ""
+  },
+  "data/common/hybrids/doppelgrau.json": {
+    "mtime": 1781046862.7799475,
+    "ast_hash": "33d85af62a18ee35a4a42cd7bf7e2263",
+    "semantic_hash": ""
+  },
+  "data/common/hybrids/grauschlange.json": {
+    "mtime": 1781046861.658749,
+    "ast_hash": "639e1b18b6f946f27c275060795dc153",
+    "semantic_hash": ""
+  },
+  "data/common/items/00_reference.json": {
+    "mtime": 1781020141.9191709,
+    "ast_hash": "9c4613413d448141f200c156a7bcb0db",
+    "semantic_hash": ""
+  },
+  "data/common/lab_tiers/00_reference.json": {
+    "mtime": 1781020142.960078,
+    "ast_hash": "8337ada84990aa7a18b51fc7eacd06ec",
+    "semantic_hash": ""
+  },
+  "data/common/locations/00_reference.json": {
+    "mtime": 1781020166.6105762,
+    "ast_hash": "912a584c0d6bec302132062eb8ba5b04",
+    "semantic_hash": ""
+  },
+  "data/common/loci/00_reference.json": {
+    "mtime": 1781020146.3438833,
+    "ast_hash": "10d481adcaca847555f6013b54b05a4c",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_bioluminescent_01.json": {
+    "mtime": 1781018044.0326326,
+    "ast_hash": "51e1beb7e585f49c176f870dd6e3e5b0",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_bioluminescent_02.json": {
+    "mtime": 1781018044.0836635,
+    "ast_hash": "2f1e5af84a99d7df58cc1c54bcbf7677",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_bioluminescent_03.json": {
+    "mtime": 1781018044.0859976,
+    "ast_hash": "9df698c56d1bef12bf2551dba7970e77",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_bioluminescent_04.json": {
+    "mtime": 1781018044.087008,
+    "ast_hash": "32d1ae6bc659d37b212f556b20f1da91",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_corrosive_01.json": {
+    "mtime": 1781018044.0891337,
+    "ast_hash": "fadef8ade96e2d85ca56a5bf77a838fe",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_corrosive_02.json": {
+    "mtime": 1781018044.0916047,
+    "ast_hash": "66425207fe948a69bd126362b7b32bf2",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_corrosive_03.json": {
+    "mtime": 1781018044.0936165,
+    "ast_hash": "bf3d18f9f77a400170859ca5488c6305",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_corrosive_04.json": {
+    "mtime": 1781018044.0959597,
+    "ast_hash": "d82403d61c474711a9b9b75fd84f7770",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_electrical_01.json": {
+    "mtime": 1781018044.0979588,
+    "ast_hash": "e04b1a3218b2a9b936af2bd936ac5f75",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_electrical_02.json": {
+    "mtime": 1781018044.100172,
+    "ast_hash": "d97b12d67a748531afe08898039e0121",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_electrical_03.json": {
+    "mtime": 1781018044.1011722,
+    "ast_hash": "31f33d407c8a6b883ea9c12e1e185702",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_electrical_04.json": {
+    "mtime": 1781018044.1031709,
+    "ast_hash": "3ed19ae76b93a868c9802092e554d104",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_hydraulic_01.json": {
+    "mtime": 1781018044.105282,
+    "ast_hash": "9ac5511e11c0c4afd418ae70f6aa296d",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_hydraulic_02.json": {
+    "mtime": 1781018044.1082761,
+    "ast_hash": "125953ea69766b4ff7ccf6c5d21cca24",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_hydraulic_03.json": {
+    "mtime": 1781018044.110788,
+    "ast_hash": "33f268451ec7189e9758a7f47487fc4e",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_hydraulic_04.json": {
+    "mtime": 1781018044.1129055,
+    "ast_hash": "d01c48c36e31e914a05ecfd230decca9",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_magnetic_01.json": {
+    "mtime": 1781018044.1164186,
+    "ast_hash": "9b3020c01218a32b0b051a70a23c2e06",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_magnetic_02.json": {
+    "mtime": 1781018044.1184194,
+    "ast_hash": "2c76715a32a35e7f08ac7cd0be1574dd",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_magnetic_03.json": {
+    "mtime": 1781018044.121445,
+    "ast_hash": "402e5ad738e0c85f5d1b6ea44b7e9577",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_magnetic_04.json": {
+    "mtime": 1781018044.1244504,
+    "ast_hash": "0feb2f05dfcffadf3004cc58d70e44ed",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_sonic_01.json": {
+    "mtime": 1781018044.1269577,
+    "ast_hash": "44d660ef26e6668788eac83214070edb",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_sonic_02.json": {
+    "mtime": 1781018044.1289568,
+    "ast_hash": "cb781cca3643547bc8b3a36c0276b637",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_sonic_03.json": {
+    "mtime": 1781018044.1309574,
+    "ast_hash": "0e2ae8783384ae141d7face19014e8bc",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_sonic_04.json": {
+    "mtime": 1781018044.1333127,
+    "ast_hash": "7f4f17fd00e84a7f444dc900c2973fcb",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_thermal_01.json": {
+    "mtime": 1781018044.1353126,
+    "ast_hash": "76d06dd8773840870977de5d3bbff940",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_thermal_02.json": {
+    "mtime": 1781018044.1378224,
+    "ast_hash": "fe1b7066827568317c80cee9bd58686d",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_thermal_03.json": {
+    "mtime": 1781018044.140822,
+    "ast_hash": "6a21cffc3ac444e2939e4d4604268e98",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_thermal_04.json": {
+    "mtime": 1781018044.142867,
+    "ast_hash": "b26d742ab43b1bfd19715dcbcf91c415",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_toxin_01.json": {
+    "mtime": 1781018044.1458688,
+    "ast_hash": "5ae752263b1f1f13142058731399f1e2",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_toxin_02.json": {
+    "mtime": 1781018044.149379,
+    "ast_hash": "f9e0f8481b548a01f752343d6e6988a1",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_toxin_03.json": {
+    "mtime": 1781018044.1513958,
+    "ast_hash": "1df3bc427a0b78899c0866eb9ba6167d",
+    "semantic_hash": ""
+  },
+  "data/common/loci/affinity_toxin_04.json": {
+    "mtime": 1781018044.153907,
+    "ast_hash": "f504b4ade0397346d3fd3c150d502227",
+    "semantic_hash": ""
+  },
+  "data/common/loci/aging_adult_01.json": {
+    "mtime": 1781019289.1793509,
+    "ast_hash": "dc864447082a7d90220fb005aff009e5",
+    "semantic_hash": ""
+  },
+  "data/common/loci/aging_adult_02.json": {
+    "mtime": 1781019290.2093475,
+    "ast_hash": "58964ebc3ed34aabb69ae6d79e32d1c7",
+    "semantic_hash": ""
+  },
+  "data/common/loci/aging_adult_03.json": {
+    "mtime": 1781019291.2357154,
+    "ast_hash": "e8bdd7e9e340c0cf475d518fc03b1b30",
+    "semantic_hash": ""
+  },
+  "data/common/loci/aging_juvenile_01.json": {
+    "mtime": 1781019284.566883,
+    "ast_hash": "ec04f34140861cec88bc302addd9e36d",
+    "semantic_hash": ""
+  },
+  "data/common/loci/aging_juvenile_02.json": {
+    "mtime": 1781019286.3137374,
+    "ast_hash": "80faf1cd4b47e119128be1c61fc4d263",
+    "semantic_hash": ""
+  },
+  "data/common/loci/aging_juvenile_03.json": {
+    "mtime": 1781019287.663585,
+    "ast_hash": "932a7edc89a900f5604de7ff329dcc4b",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_acid_resistance.json": {
+    "mtime": 1781018046.8413167,
+    "ast_hash": "e49092906a65534c989dee1e7bcfe66d",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_acid_secretion.json": {
+    "mtime": 1781018046.8889434,
+    "ast_hash": "577602b3d0968ed647ee612d4d31c320",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_acid_spray.json": {
+    "mtime": 1781018046.9242208,
+    "ast_hash": "dcf541b83ef7a365bb8efa85b8996bf3",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_aquatic_locomotion.json": {
+    "mtime": 1781018046.9267511,
+    "ast_hash": "1c6933340b851a6231a54767ffae44ec",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_armored_hide.json": {
+    "mtime": 1781018046.9292748,
+    "ast_hash": "87dc9c8f61787d005f4272f575e3d2c9",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_bioluminescent_glow.json": {
+    "mtime": 1781018046.9302762,
+    "ast_hash": "6385a0e0a074e4a93268ba20fbd03ba5",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_burrowing.json": {
+    "mtime": 1781018046.9322748,
+    "ast_hash": "3475667405c91b0d66fef38464e2d933",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_cavitation_blast.json": {
+    "mtime": 1781018046.9342785,
+    "ast_hash": "9dad4f0f38ff8f8352099741b4de1718",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_climbing.json": {
+    "mtime": 1781018046.9355702,
+    "ast_hash": "875743b7b212c2c70428c2b3ee231cd1",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_combustion.json": {
+    "mtime": 1781018046.9380796,
+    "ast_hash": "c25f8747f375e4a399427845805fd159",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_echolocation.json": {
+    "mtime": 1781018046.9400847,
+    "ast_hash": "0dd079f7524e73abd18ab6661e38da38",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_electric_jolt.json": {
+    "mtime": 1781018046.9430854,
+    "ast_hash": "d8a5adddd43edc5071fe81a4a526c2b7",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_electric_resistance.json": {
+    "mtime": 1781018046.944594,
+    "ast_hash": "550d65f942cf7b2f8e5378ce83e362fd",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_electroreception.json": {
+    "mtime": 1781018046.9465995,
+    "ast_hash": "1640f32a8ac051aff442f3f8612b57f1",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_enhanced_olfaction.json": {
+    "mtime": 1781018046.9486003,
+    "ast_hash": "ea132c3a375ddf5678d70a4d84b17a73",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_flight.json": {
+    "mtime": 1781018046.9507778,
+    "ast_hash": "cda95f14f3a63cd2eda9c315649912bd",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_gliding.json": {
+    "mtime": 1781018046.9537766,
+    "ast_hash": "d2f95d22057dd388e703868ba01f2bcd",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_infrasound_projection.json": {
+    "mtime": 1781018046.955901,
+    "ast_hash": "6ef9fb53415dcf3d30662fcde85c3c42",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_intense_bioluminescence.json": {
+    "mtime": 1781018046.957902,
+    "ast_hash": "048d5848abd24afb035a5477097c34d3",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_magnetic_disruption.json": {
+    "mtime": 1781018046.9723692,
+    "ast_hash": "a8e72d7fe90f0b2a75d14cbcdcca7ada",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_magnetic_pulse.json": {
+    "mtime": 1781018046.97374,
+    "ast_hash": "499c7a55fddeb548ef8a40672ba6bfde",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_magnetoreception.json": {
+    "mtime": 1781018046.9762506,
+    "ast_hash": "cd8c3cb476af78089ed23f6dd5774d9a",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_photic_camouflage.json": {
+    "mtime": 1781018046.9782493,
+    "ast_hash": "6e534dde707eeb2f9184d5f88f0cc69f",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_pressure_resistance.json": {
+    "mtime": 1781018046.9807003,
+    "ast_hash": "ba51e30faade88f4aa4a9321710e312b",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_regeneration.json": {
+    "mtime": 1781018046.9827068,
+    "ast_hash": "d12c20b3832a9922ccfba1e4cc0ea09b",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_sonic_burst.json": {
+    "mtime": 1781018046.9876142,
+    "ast_hash": "55c244086e8076372d5bc676a8430588",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_static_discharge.json": {
+    "mtime": 1781018046.9906142,
+    "ast_hash": "f214e0e004a9d16f3c05338cfa3ba2fa",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_thermal_generation.json": {
+    "mtime": 1781018046.992118,
+    "ast_hash": "5cf58fb1cd855916f36f83a216f93a4e",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_thermal_resistance.json": {
+    "mtime": 1781018046.9951231,
+    "ast_hash": "3480efdbab598fd11c3f2f11556c2dcd",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_thermal_sensing.json": {
+    "mtime": 1781018046.9969294,
+    "ast_hash": "d619ecf6e995656446b5dddc4175c5f7",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_toxin_immunity.json": {
+    "mtime": 1781018046.999938,
+    "ast_hash": "df836e559a70e516dc586910ff64a28f",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_venom_injection.json": {
+    "mtime": 1781018047.0024424,
+    "ast_hash": "b9bf3e2ebdc0814710288c31bd32878b",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_venom_secretion.json": {
+    "mtime": 1781018047.004805,
+    "ast_hash": "4f143a4d7e44dc5fc466bd72254eb980",
+    "semantic_hash": ""
+  },
+  "data/common/loci/cap_water_jet.json": {
+    "mtime": 1781018047.0063095,
+    "ast_hash": "71b03dbee7d8878a7b9f01ebf77c4d65",
+    "semantic_hash": ""
+  },
+  "data/common/loci/gestation_01.json": {
+    "mtime": 1781019062.1813304,
+    "ast_hash": "9c01f6a9f8eb1f92aade93fbe9b44547",
+    "semantic_hash": ""
+  },
+  "data/common/loci/gestation_02.json": {
+    "mtime": 1781019064.1875403,
+    "ast_hash": "c5dd90eaf7de1e69968a2600e06372d7",
+    "semantic_hash": ""
+  },
+  "data/common/loci/gestation_03.json": {
+    "mtime": 1781019065.696231,
+    "ast_hash": "34948e3c001f6bb92d92c473abba3c9a",
+    "semantic_hash": ""
+  },
+  "data/common/loci/growth_rate.json": {
+    "mtime": 1781019047.422781,
+    "ast_hash": "6e9f692835813b04eec75b20698f2021",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_agi_01.json": {
+    "mtime": 1781018041.4217262,
+    "ast_hash": "f4eaed51fb5da0a18443eef4788d83bd",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_agi_02.json": {
+    "mtime": 1781018041.4684813,
+    "ast_hash": "88768c08b8561e3742022355d6ac9d91",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_agi_03.json": {
+    "mtime": 1781018041.4698358,
+    "ast_hash": "b87d4de71b282d72a26b68d56df5daae",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_agi_04.json": {
+    "mtime": 1781018041.4727032,
+    "ast_hash": "7a9feeef867731c3a4b16681d2e33e3e",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_agi_05.json": {
+    "mtime": 1781018041.474764,
+    "ast_hash": "0e87c9bf8241d314a7682c5f0e4fb4b9",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_agi_06.json": {
+    "mtime": 1781018041.4767697,
+    "ast_hash": "64e0cd50c0be3ef3939850b4d148b97a",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_agi_07.json": {
+    "mtime": 1781018041.481277,
+    "ast_hash": "9cbae7121a401f3735496b2a3d4e5432",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_agi_08.json": {
+    "mtime": 1781018041.4823408,
+    "ast_hash": "0de49d1538b3c66c606367e028e6191b",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_hea_01.json": {
+    "mtime": 1781018041.4858508,
+    "ast_hash": "19482ca0e743078db377d4288bcd897e",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_hea_02.json": {
+    "mtime": 1781018041.4873545,
+    "ast_hash": "a2067f405ffd8ce925eefea64099f090",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_hea_03.json": {
+    "mtime": 1781018041.4893591,
+    "ast_hash": "12303da05a2846680a40b3f82ea4aac3",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_hea_04.json": {
+    "mtime": 1781018041.4923818,
+    "ast_hash": "89d064062504f4c602ff0166a10e7640",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_hea_05.json": {
+    "mtime": 1781018041.494527,
+    "ast_hash": "af97cd214902b3eccb2dffc1070ad021",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_hea_06.json": {
+    "mtime": 1781018041.497532,
+    "ast_hash": "5880f54d4ea1b031110670c1f458a190",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_hea_07.json": {
+    "mtime": 1781018041.4985316,
+    "ast_hash": "bbb734cafc1db66cc08bffd7b4219170",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_hea_08.json": {
+    "mtime": 1781018041.5020416,
+    "ast_hash": "58942837f99185eb8489bab385d64749",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_limb_proportion.json": {
+    "mtime": 1781018041.5040414,
+    "ast_hash": "7c17efe5e3aa91d0598c10f698466da6",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_muscle_density.json": {
+    "mtime": 1781018041.5065517,
+    "ast_hash": "9de5a406bf8611d100aac678038640f8",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_respiratory_efficiency.json": {
+    "mtime": 1781018041.508551,
+    "ast_hash": "697e6fe6de98447d1429deae0b4b2317",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_spe_01.json": {
+    "mtime": 1781018041.511055,
+    "ast_hash": "a34fdb2509e7574cd39097a7354dd96f",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_spe_02.json": {
+    "mtime": 1781018041.51306,
+    "ast_hash": "e8994232953ad0bf46c1125830950c71",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_spe_03.json": {
+    "mtime": 1781018041.515375,
+    "ast_hash": "e7a631ab90a9b9d8e30458ba8b700606",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_spe_04.json": {
+    "mtime": 1781018041.5181248,
+    "ast_hash": "c1ccdcb382668b724435eee5a6c46e24",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_spe_05.json": {
+    "mtime": 1781018041.5204847,
+    "ast_hash": "2884429a0c27bc281d3483b088eeb0a3",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_spe_06.json": {
+    "mtime": 1781018041.5229948,
+    "ast_hash": "cb972f311418226dca153f66ff363c27",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_spe_07.json": {
+    "mtime": 1781018041.524999,
+    "ast_hash": "73f7f6d52dcec7dbb9903459193ef09c",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_spe_08.json": {
+    "mtime": 1781018041.5270016,
+    "ast_hash": "6d28c98531cca1bde63fcc466eeeea2c",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_sta_01.json": {
+    "mtime": 1781018041.5303433,
+    "ast_hash": "51ac8151183d62eb6193f611f424c3b8",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_sta_02.json": {
+    "mtime": 1781018041.5323434,
+    "ast_hash": "015bca9f739a1b170f47ba91b50008b5",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_sta_03.json": {
+    "mtime": 1781018041.535477,
+    "ast_hash": "5e04f24528dfcb0d7862c4b2a6a280c4",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_sta_04.json": {
+    "mtime": 1781018041.5377095,
+    "ast_hash": "eefd571462f6b83f0f83a50e36609c72",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_sta_05.json": {
+    "mtime": 1781018041.5407155,
+    "ast_hash": "68f36c2dc73bd1b943fa3231ea5ce97f",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_sta_06.json": {
+    "mtime": 1781018041.5432875,
+    "ast_hash": "57759df76ca39cf3484239ee52413985",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_sta_07.json": {
+    "mtime": 1781018041.5452936,
+    "ast_hash": "52f3595d4c6e026c21d088773b885144",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_sta_08.json": {
+    "mtime": 1781018041.5477245,
+    "ast_hash": "ee737553fdfc82448b753e0d6a2ee21f",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_str_01.json": {
+    "mtime": 1781018041.549752,
+    "ast_hash": "f509e8c51c0dbc65ed28d3d014e8134e",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_str_02.json": {
+    "mtime": 1781018041.5527506,
+    "ast_hash": "14560e80572019549560c9d2ec8527ad",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_str_03.json": {
+    "mtime": 1781018041.5552628,
+    "ast_hash": "6bab34d5fd0302877f54cd1c77acd6a7",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_str_04.json": {
+    "mtime": 1781018041.5582633,
+    "ast_hash": "c2a98d55cec76e0da3b1d4e27fcd4878",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_str_05.json": {
+    "mtime": 1781018041.5607753,
+    "ast_hash": "d81c3f223071bbe18e64ae0ad5acab4e",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_str_06.json": {
+    "mtime": 1781018041.5637763,
+    "ast_hash": "9f21861874c80a2cfed1026979e327a0",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_str_07.json": {
+    "mtime": 1781018041.5662882,
+    "ast_hash": "d238779f911ab81f003842a194758c7a",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_str_08.json": {
+    "mtime": 1781018041.569288,
+    "ast_hash": "e9e14fec5e9c40a3a013f317a9df3822",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_tou_01.json": {
+    "mtime": 1781018041.5718005,
+    "ast_hash": "37b4670aa0b5f2388a0229b448166027",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_tou_02.json": {
+    "mtime": 1781018041.5738,
+    "ast_hash": "89b7e870b32aaeb7d3f0e92d41232f78",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_tou_03.json": {
+    "mtime": 1781018041.5773156,
+    "ast_hash": "3368e5492246d1ec10cc7a6eaa8afd56",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_tou_04.json": {
+    "mtime": 1781018041.579313,
+    "ast_hash": "e11471a92323e90efa4b32af6d48384e",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_tou_05.json": {
+    "mtime": 1781018041.582826,
+    "ast_hash": "3526a68fb5e114c12eb4f557c1b591c2",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_tou_06.json": {
+    "mtime": 1781018041.5851376,
+    "ast_hash": "74850c6fcdd481ab7c95dfc43935a2c8",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_tou_07.json": {
+    "mtime": 1781018041.5882196,
+    "ast_hash": "1115ad2c73159c6109450be9356c7946",
+    "semantic_hash": ""
+  },
+  "data/common/loci/qtl_tou_08.json": {
+    "mtime": 1781018041.5905104,
+    "ast_hash": "e764cd8dcbb416eddd06d4dd467db078",
+    "semantic_hash": ""
+  },
+  "data/common/loci/thermal_scales.json": {
+    "mtime": 1781018952.0003462,
+    "ast_hash": "08b7b7754070b1769f6f5a0114c66cfc",
+    "semantic_hash": ""
+  },
+  "data/common/locus_families/00_reference.json": {
+    "mtime": 1781020147.740618,
+    "ast_hash": "a7a91babf47ba6097f2d3f41c507b4ff",
+    "semantic_hash": ""
+  },
+  "data/common/locus_families/affinity.json": {
+    "mtime": 1781018044.1569061,
+    "ast_hash": "d80d46e5454fc476ba359c136f0fda6f",
+    "semantic_hash": ""
+  },
+  "data/common/locus_families/aging.json": {
+    "mtime": 1781019038.1356566,
+    "ast_hash": "3c95b87fd2e59ac04de1dcd17f4d7cf8",
+    "semantic_hash": ""
+  },
+  "data/common/locus_families/capability.json": {
+    "mtime": 1781018047.0098329,
+    "ast_hash": "e568c6cd370a71e4c43875e169c8e447",
+    "semantic_hash": ""
+  },
+  "data/common/locus_families/form.json": {
+    "mtime": 1781018950.9615574,
+    "ast_hash": "de6a2957ef7f4da5e7a1ed0fc7a6985d",
+    "semantic_hash": ""
+  },
+  "data/common/locus_families/gestation.json": {
+    "mtime": 1781019040.71643,
+    "ast_hash": "07420315de634dbed8e856fccd9d7639",
+    "semantic_hash": ""
+  },
+  "data/common/locus_families/growth_rate.json": {
+    "mtime": 1781019039.674619,
+    "ast_hash": "b96decc43789651315fe4e5d435a00c7",
+    "semantic_hash": ""
+  },
+  "data/common/locus_families/qtl.json": {
+    "mtime": 1781018041.5937693,
+    "ast_hash": "d4c6f2435a133e3edda7c182cf9fc261",
+    "semantic_hash": ""
+  },
+  "data/common/materials/00_reference.json": {
+    "mtime": 1781020148.7265027,
+    "ast_hash": "fb3e1458d0637cdfd2d9413d1cf40097",
+    "semantic_hash": ""
+  },
+  "data/common/npcs/00_reference.json": {
+    "mtime": 1781020150.2060359,
+    "ast_hash": "79402586fbe8f585bb137890da08dbbe",
+    "semantic_hash": ""
+  },
+  "data/common/recipes/00_reference.json": {
+    "mtime": 1781020151.1638713,
+    "ast_hash": "8030b00f113b7fe41a326fb1d9fc7814",
+    "semantic_hash": ""
+  },
+  "data/common/sex_systems/00_reference.json": {
+    "mtime": 1781020153.0464513,
+    "ast_hash": "3f68cee81c5e46b9a0da16a1ea04e496",
+    "semantic_hash": ""
+  },
+  "data/common/sex_systems/asexual.json": {
+    "mtime": 1781009586.813509,
+    "ast_hash": "96fb70dd9713634661ccf3181cb5f917",
+    "semantic_hash": ""
+  },
+  "data/common/sex_systems/xy.json": {
+    "mtime": 1781018953.9457822,
+    "ast_hash": "c35a39c32f48ab9fa6771d337fa2b0e9",
+    "semantic_hash": ""
+  },
+  "data/common/sex_systems/zw.json": {
+    "mtime": 1781018955.369429,
+    "ast_hash": "a09be7b32f94634b8d90e84e28d208b3",
+    "semantic_hash": ""
+  },
+  "data/common/species/00_reference.json": {
+    "mtime": 1781046959.6807368,
+    "ast_hash": "c022e957ff2aa6e94bf25a36896d05c4",
+    "semantic_hash": ""
+  },
+  "data/common/species/bergschlange.json": {
+    "mtime": 1781046857.7329073,
+    "ast_hash": "95c1448d55340bb89b8d1f0f0313dbcf",
+    "semantic_hash": ""
+  },
+  "data/common/species/graufalke.json": {
+    "mtime": 1781046859.1846783,
+    "ast_hash": "15049eeec0d98b2e1a51ccc139e3941c",
+    "semantic_hash": ""
+  },
+  "data/common/species/grauvogel.json": {
+    "mtime": 1781046856.2254982,
+    "ast_hash": "06f8043adbe0f7323a1da7da2e2cea22",
+    "semantic_hash": ""
+  },
+  "data/common/species_genomes/00_reference.json": {
+    "mtime": 1781020155.3596761,
+    "ast_hash": "0b29ce1cad247b5bea2a99bd0c18b4da",
+    "semantic_hash": ""
+  },
+  "data/common/species_genomes/bergschlange_genome.json": {
+    "mtime": 1781019535.6160486,
+    "ast_hash": "4eab0768fc8170098de928ee6983c967",
+    "semantic_hash": ""
+  },
+  "data/common/species_genomes/graufalke_genome.json": {
+    "mtime": 1781019549.0786765,
+    "ast_hash": "ca642fc2e52131566f3d1ef4b62c4ad8",
+    "semantic_hash": ""
+  },
+  "data/common/species_genomes/grauvogel_genome.json": {
+    "mtime": 1781019518.006652,
+    "ast_hash": "82b8c9ee2e4f977a2961187723157203",
+    "semantic_hash": ""
+  },
+  "data/common/stats/00_reference.json": {
+    "mtime": 1781020159.1896398,
+    "ast_hash": "3cde89cb82f2eed1d5b943c1ca6a463b",
+    "semantic_hash": ""
+  },
+  "data/common/stats/agility.json": {
+    "mtime": 1780945626.791518,
+    "ast_hash": "61e70ac78f23ba1c7c134e095228681e",
+    "semantic_hash": ""
+  },
+  "data/common/stats/health.json": {
+    "mtime": 1780945630.087574,
+    "ast_hash": "95c3fb0a2151cfdfeec0025225e74598",
+    "semantic_hash": ""
+  },
+  "data/common/stats/speed.json": {
+    "mtime": 1780945628.6806166,
+    "ast_hash": "a8ee916759516c81f00412802eeb2def",
+    "semantic_hash": ""
+  },
+  "data/common/stats/stamina.json": {
+    "mtime": 1780946224.8783014,
+    "ast_hash": "29f53528c85c1a249311672296900f22",
+    "semantic_hash": ""
+  },
+  "data/common/stats/strength.json": {
+    "mtime": 1780945623.9720204,
+    "ast_hash": "e547e3d4bd91e31b358093e77c5ff535",
+    "semantic_hash": ""
+  },
+  "data/common/stats/toughness.json": {
+    "mtime": 1780945625.39941,
+    "ast_hash": "d4d65b8dc15634d5eb9080583265c057",
+    "semantic_hash": ""
+  },
+  "data/common/statuses/00_reference.json": {
+    "mtime": 1781020160.1279764,
+    "ast_hash": "55256b9ba2e637468ef632a809b6c8b4",
+    "semantic_hash": ""
+  },
+  "data/common/statuses/burned.json": {
+    "mtime": 1781018063.674942,
+    "ast_hash": "d644d816b02f88d113ebfe3e7994f0a7",
+    "semantic_hash": ""
+  },
+  "data/common/techniques/00_reference.json": {
+    "mtime": 1781020162.0410933,
+    "ast_hash": "20b8113b9676ed9c1a8cc506e2738ed9",
+    "semantic_hash": ""
+  },
+  "data/common/training_rules/00_reference.json": {
+    "mtime": 1781020163.1420884,
+    "ast_hash": "e65f94e687f15fad99e6783bfe494ca0",
+    "semantic_hash": ""
+  },
+  "data/common/training_rules/default.json": {
+    "mtime": 1780945633.9582362,
+    "ast_hash": "4f7ab9bb34540f7524535f4f99031dd5",
+    "semantic_hash": ""
+  },
+  "data/common/trust_actions/00_reference.json": {
+    "mtime": 1781020164.5197344,
+    "ast_hash": "e8a76cf3f5f22fddb324e97f7ab8c3de",
+    "semantic_hash": ""
+  },
+  "data/common/trust_tiers/00_reference.json": {
+    "mtime": 1781020165.4147372,
+    "ast_hash": "3345bdafcf17bf113cbb6bcd22ce22bf",
+    "semantic_hash": ""
+  },
+  "src/__init__.py": {
+    "mtime": 1780942021.9992914,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "src/backend/__init__.py": {
+    "mtime": 1780942643.1724894,
+    "ast_hash": "164486f4ceed1c296785c18da0e38fa7",
+    "semantic_hash": ""
+  },
+  "src/backend/hub.py": {
+    "mtime": 1781084007.3358488,
+    "ast_hash": "37a35b7303d7de24e9c60fbebc0791b1",
+    "semantic_hash": ""
+  },
+  "src/backend/results.py": {
+    "mtime": 1781104685.2601686,
+    "ast_hash": "c7cad223e0619ea6a3a707e129a3b870",
+    "semantic_hash": ""
+  },
+  "src/backend/state/__init__.py": {
+    "mtime": 1780946639.8063896,
+    "ast_hash": "9bc22c57e32ba8cca0da6e3e346c6064",
+    "semantic_hash": ""
+  },
+  "src/backend/state/attitude_state.py": {
+    "mtime": 1780942385.9437559,
+    "ast_hash": "f154bb0979f404e89db451becbd5fbf9",
+    "semantic_hash": ""
+  },
+  "src/backend/state/battle_state.py": {
+    "mtime": 1780946620.2763796,
+    "ast_hash": "95d17f43f1adb647db2e26ce07782c5a",
+    "semantic_hash": ""
+  },
+  "src/backend/state/breeding_state.py": {
+    "mtime": 1780942342.0612519,
+    "ast_hash": "ef39d36ac7c0e136b0189df93a152b53",
+    "semantic_hash": ""
+  },
+  "src/backend/state/capture_state.py": {
+    "mtime": 1781047136.527529,
+    "ast_hash": "7e6732658b32eb3537216866d563f925",
+    "semantic_hash": ""
+  },
+  "src/backend/state/crafting_state.py": {
+    "mtime": 1780942406.7529855,
+    "ast_hash": "36b45184863019d8a9bece5bb549700a",
+    "semantic_hash": ""
+  },
+  "src/backend/state/economy_state.py": {
+    "mtime": 1780942414.0514941,
+    "ast_hash": "7691251016e3e13979f1e898d2ad58ec",
+    "semantic_hash": ""
+  },
+  "src/backend/state/genetics_state.py": {
+    "mtime": 1780942322.0681095,
+    "ast_hash": "3a40ba041869d64a111c3e36d2226b6b",
+    "semantic_hash": ""
+  },
+  "src/backend/state/monster_state.py": {
+    "mtime": 1781104458.0306683,
+    "ast_hash": "7d084c4d60b0059e3ac8b0f023c6e2a5",
+    "semantic_hash": ""
+  },
+  "src/backend/state/player_state.py": {
+    "mtime": 1781083769.572156,
+    "ast_hash": "b66b628515665dd5e1f4277d4102c571",
+    "semantic_hash": ""
+  },
+  "src/backend/state/ranch_state.py": {
+    "mtime": 1781024274.3825538,
+    "ast_hash": "e6532f2dddb32467a70ee8b64e9bbed3",
+    "semantic_hash": ""
+  },
+  "src/backend/state/technique_state.py": {
+    "mtime": 1780942399.077242,
+    "ast_hash": "9d2aa201e3ee3b56ce4db80612fa0e0a",
+    "semantic_hash": ""
+  },
+  "src/backend/state/trust_state.py": {
+    "mtime": 1780942393.1519847,
+    "ast_hash": "66b068215d053d2bf414909f59aa22c8",
+    "semantic_hash": ""
+  },
+  "src/backend/state/values_state.py": {
+    "mtime": 1780942422.208007,
+    "ast_hash": "dc4a40d6bd4ddbc40182e2afc6089da6",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/__init__.py": {
+    "mtime": 1780942428.1125367,
+    "ast_hash": "42c399b405ea7d0b859891a792cc44cf",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/attitude.py": {
+    "mtime": 1780942531.0122828,
+    "ast_hash": "a543a5deb8e2b012e38f6d222e37ac36",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/battle.py": {
+    "mtime": 1780946632.2638402,
+    "ast_hash": "ac82b9e84bee048bb249d2c8b3c89b97",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/breeding.py": {
+    "mtime": 1780942486.768993,
+    "ast_hash": "fe457274e67f84a2876d64d3f1604e7c",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/capture.py": {
+    "mtime": 1781047138.2308097,
+    "ast_hash": "6e410294078b0a2a42cce3686dbaeba9",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/companion_ai.py": {
+    "mtime": 1781104807.5657926,
+    "ast_hash": "403c2f1603a9b7131a913ff693b7fa00",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/crafting.py": {
+    "mtime": 1780942574.0747118,
+    "ast_hash": "5f5ac5c248dd716fc0215b29b01e33c6",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/data.py": {
+    "mtime": 1781104284.6441257,
+    "ast_hash": "f983610f0708837e1be588faf913da40",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/economy.py": {
+    "mtime": 1780942588.924484,
+    "ast_hash": "2feedc1b82e6fdf14e9bef6614a62715",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/genetics.py": {
+    "mtime": 1781104582.744836,
+    "ast_hash": "5fe47db0e2407b8aacf95fcbcc033b33",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/ranch.py": {
+    "mtime": 1781104722.372248,
+    "ast_hash": "c224588ee3532a33699ff61b8696a589",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/technique.py": {
+    "mtime": 1780942561.6880977,
+    "ast_hash": "e6f5a0679d5d93296200033bc1427ec3",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/trust.py": {
+    "mtime": 1780942547.0116804,
+    "ast_hash": "c4880d4aa8a750b275e9230f7dacbe83",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/values.py": {
+    "mtime": 1780942609.5821888,
+    "ast_hash": "e7e9c20f66976346d08a714d69cfbef4",
+    "semantic_hash": ""
+  },
+  "src/backend/systems/world.py": {
+    "mtime": 1781104847.7356546,
+    "ast_hash": "294f4686aa3502d6c45b135191db6f74",
+    "semantic_hash": ""
+  },
+  "src/engine/__init__.py": {
+    "mtime": 1780942021.9992914,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "src/engine/battle.py": {
+    "mtime": 1780942396.484041,
+    "ast_hash": "2ca344eba56697880b4017ba37b29ecd",
+    "semantic_hash": ""
+  },
+  "src/engine/breeding.py": {
+    "mtime": 1781013878.2411118,
+    "ast_hash": "0d718cf8d5a0062cf32b0be59c24360f",
+    "semantic_hash": ""
+  },
+  "src/engine/capture.py": {
+    "mtime": 1780942409.3318543,
+    "ast_hash": "598cf7b6391fc089c454689c731657d0",
+    "semantic_hash": ""
+  },
+  "src/engine/economy.py": {
+    "mtime": 1780942421.3895018,
+    "ast_hash": "412826be24430891b0af18588be33d19",
+    "semantic_hash": ""
+  },
+  "src/engine/genetics.py": {
+    "mtime": 1781104619.8115363,
+    "ast_hash": "d3c0d4aed9385c1b828391ecbd29992f",
+    "semantic_hash": ""
+  },
+  "src/engine/growth.py": {
+    "mtime": 1781019479.9722183,
+    "ast_hash": "d1ae744ec6835cc0591191eff0ecd762",
+    "semantic_hash": ""
+  },
+  "src/engine/loader/__init__.py": {
+    "mtime": 1781002092.1132028,
+    "ast_hash": "0e59c2a754a83ecaf04508683dcd8c45",
+    "semantic_hash": ""
+  },
+  "src/engine/loader/core.py": {
+    "mtime": 1781046897.9537146,
+    "ast_hash": "2ee319dba89c16eb036fd6eb37378b14",
+    "semantic_hash": ""
+  },
+  "src/engine/loader/factories.py": {
+    "mtime": 1781046894.635849,
+    "ast_hash": "845802000fc59755cc9ad70fc14a3a5a",
+    "semantic_hash": ""
+  },
+  "src/engine/loader/refs.py": {
+    "mtime": 1781002022.4900057,
+    "ast_hash": "881091dbd67910a8d4f09e5f37f84ecf",
+    "semantic_hash": ""
+  },
+  "src/engine/overworld.py": {
+    "mtime": 1781104356.0324566,
+    "ast_hash": "b38f067850e5cd261243f86f4226d40f",
+    "semantic_hash": ""
+  },
+  "src/engine/phenotype.py": {
+    "mtime": 1781020995.687601,
+    "ast_hash": "e6ae3744a554a3608f80ff4014690cdd",
+    "semantic_hash": ""
+  },
+  "src/engine/rng.py": {
+    "mtime": 1781104332.9725397,
+    "ast_hash": "996d8d0948956f2681b79a3e452a8be5",
+    "semantic_hash": ""
+  },
+  "src/engine/schemas.py": {
+    "mtime": 1781104210.8167076,
+    "ast_hash": "932ab988a63a1ae315298f3c44ec708e",
+    "semantic_hash": ""
+  },
+  "src/engine/sex.py": {
+    "mtime": 1781020961.7875347,
+    "ast_hash": "1bda24409d6c768414c6e0caf041337a",
+    "semantic_hash": ""
+  },
+  "src/engine/stats.py": {
+    "mtime": 1781106486.7783139,
+    "ast_hash": "a407774f0e23dac07703bc9988dc3255",
+    "semantic_hash": ""
+  },
+  "src/engine/symbols.py": {
+    "mtime": 1781038063.1718612,
+    "ast_hash": "2531c6401da2a7d920c7fb25f83d273e",
+    "semantic_hash": ""
+  },
+  "src/engine/ui_layout/__init__.py": {
+    "mtime": 1781103290.9079733,
+    "ast_hash": "cba199755ee43aa2f4bef965f8d45aff",
+    "semantic_hash": ""
+  },
+  "src/engine/ui_layout/layouts.py": {
+    "mtime": 1781103261.8656478,
+    "ast_hash": "f956fb9431f0781f7d7cc40a1ada6511",
+    "semantic_hash": ""
+  },
+  "src/engine/ui_layout/rect.py": {
+    "mtime": 1781103243.2705376,
+    "ast_hash": "f87f0ce572f8d0734810951d88ccaaba",
+    "semantic_hash": ""
+  },
+  "src/engine/ui_layout/resolve.py": {
+    "mtime": 1781103281.1733806,
+    "ast_hash": "286db46afb5eecc588058ff262468b68",
+    "semantic_hash": ""
+  },
+  "src/engine/world.py": {
+    "mtime": 1781083995.7532315,
+    "ast_hash": "86e831b8167bbd223e954184e1462ae5",
+    "semantic_hash": ""
+  },
+  "src/engine/yields.py": {
+    "mtime": 1781002551.6288128,
+    "ast_hash": "2e5c5250b401c674a202b44f31a3b318",
+    "semantic_hash": ""
+  },
+  "src/frontend/__init__.py": {
+    "mtime": 1780942022.0002778,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "src/frontend/app.py": {
+    "mtime": 1781105430.3852103,
+    "ast_hash": "6811d5763b1f66c17ca9bc2024298c27",
+    "semantic_hash": ""
+  },
+  "src/frontend/controllers/__init__.py": {
+    "mtime": 1780947110.0133138,
+    "ast_hash": "d274d9a6fb2da1b708ab1067ce155c21",
+    "semantic_hash": ""
+  },
+  "src/frontend/controllers/battle_controller.py": {
+    "mtime": 1780947139.007571,
+    "ast_hash": "fb1aef9d80d717ed5391974f3c3023e2",
+    "semantic_hash": ""
+  },
+  "src/frontend/controllers/breeding_controller.py": {
+    "mtime": 1780947186.7213495,
+    "ast_hash": "e2c4b60d87706d5b6abf270e8c76c029",
+    "semantic_hash": ""
+  },
+  "src/frontend/controllers/genome_panel_controller.py": {
+    "mtime": 1780947125.1805506,
+    "ast_hash": "2b0e83800f178299d489b2952791c069",
+    "semantic_hash": ""
+  },
+  "src/frontend/controllers/overworld_controller.py": {
+    "mtime": 1781046240.9422088,
+    "ast_hash": "597bddb197b4f9bea04975c674c7a17a",
+    "semantic_hash": ""
+  },
+  "src/frontend/controllers/party_controller.py": {
+    "mtime": 1781107408.1309423,
+    "ast_hash": "ee680bdf6eb83cca1d009565c56835c8",
+    "semantic_hash": ""
+  },
+  "src/frontend/controllers/ranch_controller.py": {
+    "mtime": 1780947153.2059884,
+    "ast_hash": "66d29df61a567c64531e333c8c86de78",
+    "semantic_hash": ""
+  },
+  "src/frontend/controllers/technique_registry_controller.py": {
+    "mtime": 1780947197.910537,
+    "ast_hash": "849f82af421dc6437f668d860babdc4c",
+    "semantic_hash": ""
+  },
+  "src/frontend/hud/__init__.py": {
+    "mtime": 1780946911.508559,
+    "ast_hash": "3ab901c63a0acd9efa96632354565044",
+    "semantic_hash": ""
+  },
+  "src/frontend/hud/hud.py": {
+    "mtime": 1781103492.0522316,
+    "ast_hash": "7438f88b77f9f04475c5c1f3facc61dc",
+    "semantic_hash": ""
+  },
+  "src/frontend/hud/party_panel.py": {
+    "mtime": 1781109155.1434186,
+    "ast_hash": "82acc13252fca353f35f2e4c790a5717",
+    "semantic_hash": ""
+  },
+  "src/frontend/hud/widgets/__init__.py": {
+    "mtime": 1781103473.139955,
+    "ast_hash": "8997a784fa6c65938927e4b5f0616108",
+    "semantic_hash": ""
+  },
+  "src/frontend/hud/widgets/bar.py": {
+    "mtime": 1781103441.9843862,
+    "ast_hash": "47e997a348c51212ae8711d424738ded",
+    "semantic_hash": ""
+  },
+  "src/frontend/hud/widgets/base.py": {
+    "mtime": 1781103386.082015,
+    "ast_hash": "b9cb410fc0ee038e25de70339a6c6ab4",
+    "semantic_hash": ""
+  },
+  "src/frontend/hud/widgets/button.py": {
+    "mtime": 1781103430.1236775,
+    "ast_hash": "cfa13d8bcb061faee0955adc78fe9702",
+    "semantic_hash": ""
+  },
+  "src/frontend/hud/widgets/icon.py": {
+    "mtime": 1781106292.654464,
+    "ast_hash": "0a89e58323946c24e9da39bfe47c7ef5",
+    "semantic_hash": ""
+  },
+  "src/frontend/hud/widgets/label.py": {
+    "mtime": 1781103416.982596,
+    "ast_hash": "4002ef18f7d13b2f6184ab48426abc1d",
+    "semantic_hash": ""
+  },
+  "src/frontend/hud/widgets/list_view.py": {
+    "mtime": 1781103464.3091154,
+    "ast_hash": "901efc03a11cb89a6d50046308448178",
+    "semantic_hash": ""
+  },
+  "src/frontend/hud/widgets/panel.py": {
+    "mtime": 1781103403.9159338,
+    "ast_hash": "8783418174d9a391f6a8ec6f4d90f62c",
+    "semantic_hash": ""
+  },
+  "src/frontend/renderer/__init__.py": {
+    "mtime": 1780946800.1770506,
+    "ast_hash": "360fa036551ef5bf2fd79b47226265eb",
+    "semantic_hash": ""
+  },
+  "src/frontend/renderer/camera.py": {
+    "mtime": 1781090770.3492825,
+    "ast_hash": "102fbd0f1a6d06310eab37097a29b1ca",
+    "semantic_hash": ""
+  },
+  "src/frontend/renderer/lighting.py": {
+    "mtime": 1781100552.8975265,
+    "ast_hash": "a45fa364e533e16ed803bc19950497de",
+    "semantic_hash": ""
+  },
+  "src/frontend/renderer/performance.py": {
+    "mtime": 1781046202.2134452,
+    "ast_hash": "86f605018fe85536dbdd6bba75e04032",
+    "semantic_hash": ""
+  },
+  "src/frontend/renderer/post_process.py": {
+    "mtime": 1781100580.4404464,
+    "ast_hash": "88debae49873e0a1131e518410df4af4",
+    "semantic_hash": ""
+  },
+  "src/frontend/scenes/__init__.py": {
+    "mtime": 1780946949.15375,
+    "ast_hash": "3f4ecb0c5014752cfa5e42b46162a091",
+    "semantic_hash": ""
+  },
+  "src/frontend/scenes/battle.py": {
+    "mtime": 1780947014.71256,
+    "ast_hash": "bb11b21ebe4453f713f1362a2e894d65",
+    "semantic_hash": ""
+  },
+  "src/frontend/scenes/breeding.py": {
+    "mtime": 1780947082.3595178,
+    "ast_hash": "822b0da7e93bc27c91696b8e6511fd09",
+    "semantic_hash": ""
+  },
+  "src/frontend/scenes/genome_panel.py": {
+    "mtime": 1780946985.9631584,
+    "ast_hash": "f5c9e798e1177d1c532dd0c899b64034",
+    "semantic_hash": ""
+  },
+  "src/frontend/scenes/overworld.py": {
+    "mtime": 1781110352.3414373,
+    "ast_hash": "ddbda20e3c78449bf999c2b9af28ce75",
+    "semantic_hash": ""
+  },
+  "src/frontend/scenes/ranch.py": {
+    "mtime": 1780947031.3603766,
+    "ast_hash": "a41744aaa3bdc653d4405948b13aa7af",
+    "semantic_hash": ""
+  },
+  "src/frontend/scenes/technique_registry.py": {
+    "mtime": 1780947104.116762,
+    "ast_hash": "aae7fe050e1c921cd5f869663f4f1d73",
+    "semantic_hash": ""
+  },
+  "src/frontend/sprite_loader.py": {
+    "mtime": 1781109406.8304334,
+    "ast_hash": "73364480c86add018904766359d3c5db",
+    "semantic_hash": ""
+  },
+  "src/frontend/sprite_resolver.py": {
+    "mtime": 1781106168.4403582,
+    "ast_hash": "0c0b7a458e2880940c990a9909bc7e72",
+    "semantic_hash": ""
+  },
+  "src/frontend/terrain_height.py": {
+    "mtime": 1781094413.6885574,
+    "ast_hash": "f9a1d627c203082831c631d500ab64bd",
+    "semantic_hash": ""
+  },
+  "src/frontend/terrain_textures.py": {
+    "mtime": 1781095969.3742971,
+    "ast_hash": "a56d93635b4de0bc0197c8239dabe046",
+    "semantic_hash": ""
+  },
+  "src/main.py": {
+    "mtime": 1781095813.833097,
+    "ast_hash": "1e5e076a2e8fb0c4646b177d25b4cfef",
+    "semantic_hash": ""
+  },
+  "tests/__init__.py": {
+    "mtime": 1781004783.6514344,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "tests/engine/__init__.py": {
+    "mtime": 1781004784.12659,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "tests/engine/breeding_hybrid_test.py": {
+    "mtime": 1781013973.0678706,
+    "ast_hash": "6a38c93e31dffeb1417b38c50b83b8f1",
+    "semantic_hash": ""
+  },
+  "tests/engine/breeding_test.py": {
+    "mtime": 1781010566.9615715,
+    "ast_hash": "c3bb36cdb7469adf875e5f7ecab52b37",
+    "semantic_hash": ""
+  },
+  "tests/engine/conftest.py": {
+    "mtime": 1781106490.5473883,
+    "ast_hash": "0f7b0e91db8ef9accd5d74d2b91a66ec",
+    "semantic_hash": ""
+  },
+  "tests/engine/genetics_test.py": {
+    "mtime": 1781004861.9007437,
+    "ast_hash": "5f6c71dc12c36c1e1d526370486c4cc6",
+    "semantic_hash": ""
+  },
+  "tests/engine/growth_test.py": {
+    "mtime": 1781004912.9734364,
+    "ast_hash": "2c6537ee683abe93896b2c93a8072e9a",
+    "semantic_hash": ""
+  },
+  "tests/engine/overworld_test.py": {
+    "mtime": 1781104409.4808643,
+    "ast_hash": "46dc415f4b7fe00b559d182a5fc5daf5",
+    "semantic_hash": ""
+  },
+  "tests/engine/phenotype_test.py": {
+    "mtime": 1781005057.523687,
+    "ast_hash": "6fb2a5612495b56ae07dd3e8c8163eed",
+    "semantic_hash": ""
+  },
+  "tests/engine/sex_linkage_test.py": {
+    "mtime": 1781010608.9430218,
+    "ast_hash": "f9d2279abab425d75d0fd74f42b8a909",
+    "semantic_hash": ""
+  },
+  "tests/engine/sex_test.py": {
+    "mtime": 1781010322.8809338,
+    "ast_hash": "ef3c4a0b7ebe2b209771f8556da32f08",
+    "semantic_hash": ""
+  },
+  "tests/engine/stats_test.py": {
+    "mtime": 1781106602.2922184,
+    "ast_hash": "a28b77fe8feb0ae3e8ec603270bcd1ab",
+    "semantic_hash": ""
+  },
+  "tests/engine/ui_layout_test.py": {
+    "mtime": 1781103332.5730894,
+    "ast_hash": "441ca274fa8db57c1fa2744e3ada39bb",
+    "semantic_hash": ""
+  },
+  "tests/engine/world_test.py": {
+    "mtime": 1781083945.0147157,
+    "ast_hash": "c2726fc9e260bb6cd3ed9cb68fdb0ae5",
+    "semantic_hash": ""
+  },
+  "tests/engine/yields_test.py": {
+    "mtime": 1781005086.7944908,
+    "ast_hash": "563ee4a4be41f53e8367bd1fabdaf317",
+    "semantic_hash": ""
+  },
+  "tools/stat_report.py": {
+    "mtime": 1781106680.0437288,
+    "ast_hash": "4e9d129e8c6ab62febe2d350e58efa60",
+    "semantic_hash": ""
+  },
+  "utils/assign_terrain_materials.py": {
+    "mtime": 1781101916.530525,
+    "ast_hash": "89b1c17b200a65b355b4bbb5844e26e2",
+    "semantic_hash": ""
+  },
+  "utils/gen_blob_shadow.py": {
+    "mtime": 1781098689.4307067,
+    "ast_hash": "4d14e493c77889ae0849dbf64d6a554c",
+    "semantic_hash": ""
+  },
+  "utils/inspect_glb.py": {
+    "mtime": 1781074689.1654296,
+    "ast_hash": "487025d2b4882301e6fce63841640b22",
+    "semantic_hash": ""
+  },
+  "utils/sprite_trim.py": {
+    "mtime": 1781047163.976758,
+    "ast_hash": "78f8de763b09a2c989465ac0d155b0bc",
+    "semantic_hash": ""
+  },
+  "utils/texture_gen.py": {
+    "mtime": 1780945578.6913936,
+    "ast_hash": "3b1cea9b2b50c00c277252638c19cc4f",
+    "semantic_hash": ""
+  },
+  ".claude/agents/apply-pattern.md": {
+    "mtime": 1780920499.9072132,
+    "ast_hash": "77a5c753c6837846cd639bc412fbc407",
+    "semantic_hash": ""
+  },
+  ".claude/agents/best-practices-researcher.md": {
+    "mtime": 1780920546.8330083,
+    "ast_hash": "f791a69d98c7eac00f9d2634c70a3315",
+    "semantic_hash": ""
+  },
+  ".claude/agents/boilerplate-filler.md": {
+    "mtime": 1780920512.7075744,
+    "ast_hash": "64ef1d7127f3febfc1628a9f116efab8",
+    "semantic_hash": ""
+  },
+  ".claude/agents/rename-symbol.md": {
+    "mtime": 1780920507.4886806,
+    "ast_hash": "23aca27a0eec21b6af5137f7cfad738b",
+    "semantic_hash": ""
+  },
+  ".claude/agents/sync-checker.md": {
+    "mtime": 1781019996.1040478,
+    "ast_hash": "9979f12ddb57d7c4276f71b7d9a2f492",
+    "semantic_hash": ""
+  },
+  ".claude/agents/test-writer.md": {
+    "mtime": 1780920539.3589313,
+    "ast_hash": "8a3f64f552ccee7f28dd61f5889297a7",
+    "semantic_hash": ""
+  },
+  ".claude/rules/backend-contract.md": {
+    "mtime": 1780920190.740742,
+    "ast_hash": "32341ea357fe781d6f11ee6835cd00e5",
+    "semantic_hash": ""
+  },
+  ".claude/rules/data-integrity.md": {
+    "mtime": 1781039192.5678868,
+    "ast_hash": "91e52971f3f71b1883dde2c0026fdbfa",
+    "semantic_hash": ""
+  },
+  ".claude/rules/data-structure-design.md": {
+    "mtime": 1780920109.7829056,
+    "ast_hash": "264b39d38ff83c06590e5c460048b16e",
+    "semantic_hash": ""
+  },
+  ".claude/rules/engine-contract.md": {
+    "mtime": 1781103586.9573407,
+    "ast_hash": "8096ac4274cadc4886eb09fdd12b9401",
+    "semantic_hash": ""
+  },
+  ".claude/rules/file-size-limit.md": {
+    "mtime": 1780920141.336931,
+    "ast_hash": "cdac37a35e8c864495b5011175fd589d",
+    "semantic_hash": ""
+  },
+  ".claude/rules/frontend-contract.md": {
+    "mtime": 1780942075.1196966,
+    "ast_hash": "a721629d16a0cec763508363120ff4dd",
+    "semantic_hash": ""
+  },
+  ".claude/rules/hud-layout.md": {
+    "mtime": 1781103539.7745938,
+    "ast_hash": "16b200cf2706c09cf706ef3f7a4e274c",
+    "semantic_hash": ""
+  },
+  ".claude/rules/implementation-completeness.md": {
+    "mtime": 1780920266.3234658,
+    "ast_hash": "f64afb4430217864c39adc050e7a7f14",
+    "semantic_hash": ""
+  },
+  ".claude/rules/localization.md": {
+    "mtime": 1780920244.6307607,
+    "ast_hash": "15ce2eb1245cb43d2cef0fd2df3781fd",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1781110703.231907,
+    "ast_hash": "c216ae88ccafab308176aa2116ae23e3",
+    "semantic_hash": ""
+  },
+  "FRONTEND_RESEARCH_FINDINGS.md": {
+    "mtime": 1781079290.0217235,
+    "ast_hash": "2f280b22ccbca285951a828ab999fab0",
+    "semantic_hash": ""
+  },
+  "TERRAIN_TEXTURE_HANDOFF.md": {
+    "mtime": 1781094668.3196735,
+    "ast_hash": "ec1500ef303d3ddd6509e0f15e335d0b",
+    "semantic_hash": ""
+  },
+  "data/VOCABULARY.md": {
+    "mtime": 1781038067.8882148,
+    "ast_hash": "2f825ef1f137bde06a2dc8f4d019e10f",
+    "semantic_hash": ""
+  },
+  "data/localization/en/ui.yml": {
+    "mtime": 1781105388.4575787,
+    "ast_hash": "ce390e9dbd3131038e66548b789e8ab4",
+    "semantic_hash": ""
+  },
+  "docs/CLAUDE.md": {
+    "mtime": 1780920038.295401,
+    "ast_hash": "0408b6385a7d1b57452bc08bd6dd4d7b",
+    "semantic_hash": ""
+  },
+  "docs/Nuovo Documento di testo.txt": {
+    "mtime": 1781080309.2419333,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "docs/STRATEGY.md": {
+    "mtime": 1780939917.7965615,
+    "ast_hash": "5fcb1f5e2116e1f881de83e5b17ef798",
+    "semantic_hash": ""
+  },
+  "docs/art-direction/assets.md": {
+    "mtime": 1780931903.294377,
+    "ast_hash": "79c0362bd583caa82fb734ea80554f2f",
+    "semantic_hash": ""
+  },
+  "docs/art-direction/blender-terrain-export.md": {
+    "mtime": 1781084294.3011496,
+    "ast_hash": "6177015b21d322f8684c49dd892d59ff",
+    "semantic_hash": ""
+  },
+  "docs/art-direction/camera.md": {
+    "mtime": 1780931819.779548,
+    "ast_hash": "87804767dfb80166d86e52373e33661a",
+    "semantic_hash": ""
+  },
+  "docs/art-direction/lighting.md": {
+    "mtime": 1780931955.2202516,
+    "ast_hash": "1c44c510e3732bbf425d868d8c0a48a8",
+    "semantic_hash": ""
+  },
+  "docs/art-direction/tech-stack.md": {
+    "mtime": 1780931596.7155476,
+    "ast_hash": "bae9a72a0de2707d6474cd78005ef990",
+    "semantic_hash": ""
+  },
+  "docs/art-direction/visual-language.md": {
+    "mtime": 1780931897.225854,
+    "ast_hash": "5feded5af55f4108fe4697e6550cef74",
+    "semantic_hash": ""
+  },
+  "docs/mechanics/breeding-hybridization.md": {
+    "mtime": 1780939905.7182126,
+    "ast_hash": "7570889388fb5b7eaf01ce7d57a6d697",
+    "semantic_hash": ""
+  },
+  "docs/mechanics/capture-and-ranches.md": {
+    "mtime": 1780938330.9195347,
+    "ast_hash": "27009eb3649f21a0ad8cf3bdef47e79f",
+    "semantic_hash": ""
+  },
+  "docs/mechanics/genetics.md": {
+    "mtime": 1780939137.6901479,
+    "ast_hash": "9669271f3dc0f01078e78842c98c07b1",
+    "semantic_hash": ""
+  },
+  "docs/mechanics/monster-attitude.md": {
+    "mtime": 1780938994.9568248,
+    "ast_hash": "ef88965c6518895df6c656cc0362d975",
+    "semantic_hash": ""
+  },
+  "docs/mechanics/monster-economy.md": {
+    "mtime": 1780938330.923034,
+    "ast_hash": "2a6f097358937d1d6e009ec95bd33053",
+    "semantic_hash": ""
+  },
+  "docs/mechanics/resource-crafting.md": {
+    "mtime": 1780939880.455042,
+    "ast_hash": "f800f25f2d9bb0f88e492130b7efccb0",
+    "semantic_hash": ""
+  },
+  "docs/mechanics/technique-crafting.md": {
+    "mtime": 1780938330.9100125,
+    "ast_hash": "e4997b28907f731aecfd68d3e03cb696",
+    "semantic_hash": ""
+  },
+  "docs/mechanics/trust.md": {
+    "mtime": 1780938325.7542017,
+    "ast_hash": "5856fa2e6acec9ce5b0bc865a302a2e4",
+    "semantic_hash": ""
+  },
+  "docs/mechanics/turn-based-battle.md": {
+    "mtime": 1780939101.1921246,
+    "ast_hash": "38e5393eb0f450e08a7ccf6333398b0b",
+    "semantic_hash": ""
+  },
+  "docs/mechanics/values-judgment.md": {
+    "mtime": 1780938330.9270444,
+    "ast_hash": "a3cc9be29ab65bb43eef9620fe89b941",
+    "semantic_hash": ""
+  },
+  "docs/worldbuilding/characters.md": {
+    "mtime": 1780929699.0432546,
+    "ast_hash": "db51d0b531984ae5de4da34f5bf334b7",
+    "semantic_hash": ""
+  },
+  "docs/worldbuilding/lore.md": {
+    "mtime": 1780929639.123022,
+    "ast_hash": "b182f83cfd682564c298145f0c5ce570",
+    "semantic_hash": ""
+  },
+  "docs/worldbuilding/narrative.md": {
+    "mtime": 1780929814.3553686,
+    "ast_hash": "7dfcef5d098518d4adf1cf555294c728",
+    "semantic_hash": ""
+  },
+  "docs/worldbuilding/world.md": {
+    "mtime": 1780929567.9210446,
+    "ast_hash": "89973bd046102e51bb0d753855c51de7",
+    "semantic_hash": ""
+  },
+  "requirements.txt": {
+    "mtime": 1781074634.635913,
+    "ast_hash": "29226952ec8a0f6bb52cf209dd632abe",
+    "semantic_hash": ""
+  },
+  "shadow_check.png": {
+    "mtime": 1781110402.023396,
+    "ast_hash": "25fbd82727dcd939ea8ad96ea8ea37db",
+    "semantic_hash": ""
+  },
+  "shadow_test.png": {
+    "mtime": 1781110271.9593027,
+    "ast_hash": "5c9024ddf8cf92a472a2bc9c4d1d35ec",
+    "semantic_hash": ""
+  }
+}
