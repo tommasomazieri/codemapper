@@ -5,6 +5,7 @@ graphify_runner, python_depth). No separate API server is required. The REST API
 (api.py) remains an independent optional surface for non-MCP integrations.
 """
 
+import datetime
 import json
 import os
 from pathlib import Path
@@ -19,6 +20,17 @@ mcp = FastMCP("codemapper2")
 
 def _root() -> Path:
     return Path(os.environ.get("CODEMAPPER_ROOT", ".")).resolve()
+
+
+def _log_mcp(root: Path, tool: str, **params) -> None:
+    try:
+        log_path = root / "graphify-out" / "mcp_usage.jsonl"
+        record = {"ts": datetime.datetime.now().isoformat(timespec="milliseconds"),
+                  "event": "mcp_call", "tool": tool, **params}
+        with log_path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record) + "\n")
+    except OSError:
+        pass
 
 
 def _graph() -> GraphIndex:
@@ -43,6 +55,7 @@ def build(no_llm: bool = False, backend: str | None = None) -> str:
     from codemapper.annotator import annotate
 
     root = _root()
+    _log_mcp(root, "build", no_llm=no_llm)
     graphify_runner.build(root, no_llm=no_llm, backend=backend)
     try:
         _, counts = annotate(root)
@@ -78,6 +91,7 @@ def god_nodes(
         min_complexity: Only nodes with at least this cyclomatic complexity.
         dead_only: Only nodes flagged as dead code.
     """
+    _log_mcp(_root(), "god_nodes", n=n, stale_only=stale_only, min_complexity=min_complexity, dead_only=dead_only)
     g = _graph()
     nodes = g.get_god_nodes(n=n, stale_only=stale_only, min_complexity=min_complexity, dead_only=dead_only)
     return json.dumps([
@@ -97,7 +111,9 @@ def explore(query: str, budget: int = 2000) -> str:
         query: A natural-language question (e.g. "how does auth talk to the db?").
         budget: Output token cap for the traversal (graphify default 2000).
     """
-    return graphify_runner.query(query, _root(), budget=budget)
+    root = _root()
+    _log_mcp(root, "explore", query=query)
+    return graphify_runner.query(query, root, budget=budget)
 
 
 @mcp.tool()
@@ -108,7 +124,9 @@ def path_between(a: str, b: str) -> str:
         a: Source node label or concept.
         b: Target node label or concept.
     """
-    return graphify_runner.path_query(a, b, _root())
+    root = _root()
+    _log_mcp(root, "path_between", a=a, b=b)
+    return graphify_runner.path_query(a, b, root)
 
 
 @mcp.tool()
@@ -119,6 +137,7 @@ def community(node_id: str) -> str:
     Args:
         node_id: The graph node id.
     """
+    _log_mcp(_root(), "community", node_id=node_id)
     g = _graph()
     members = g.get_community(node_id)
     focal = g.get_node(node_id)
@@ -138,6 +157,7 @@ def neighbors(node_id: str, relation: str | None = None) -> str:
         node_id: The graph node id.
         relation: Edge relation filter.
     """
+    _log_mcp(_root(), "neighbors", node_id=node_id, relation=relation)
     g = _graph()
     out = g.get_neighbors(node_id, relation=relation)
     inc = g.get_incoming(node_id, relation=relation)
@@ -166,6 +186,7 @@ def diagnose(path: str | None = None, scope: str | None = None) -> str:
     from codemapper.index import CodeIndex
 
     root = _root()
+    _log_mcp(root, "diagnose", path=path, scope=scope)
     index = CodeIndex(root)
     index.build()
     scope_list = [s.strip() for s in scope.split(",")] if scope else list(ANALYZERS)
@@ -192,7 +213,9 @@ def python_sig(path: str, symbol: str) -> str:
         symbol: The function/method/class name.
     """
     from codemapper.python_depth import signature
-    result = signature(_root(), path, symbol)
+    root = _root()
+    _log_mcp(root, "python_sig", path=path, symbol=symbol)
+    result = signature(root, path, symbol)
     return json.dumps(result or {"error": f"no Python symbol '{symbol}' in {path}"}, indent=2)
 
 

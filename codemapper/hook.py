@@ -6,6 +6,7 @@ at the MCP tools. Stays silent (exit 0, no output) when no graph exists, so it i
 inert in repos that haven't run setup.
 """
 
+import datetime
 import json
 import re
 import sys
@@ -26,6 +27,16 @@ BLOCK_REASON = (
 NAV_PATTERNS = re.compile(r'\b(grep|rg|find|cat|head|tail|sed|awk)\b')
 
 
+def _log(cwd: Path, record: dict) -> None:
+    try:
+        log_path = cwd / "graphify-out" / "mcp_usage.jsonl"
+        record["ts"] = datetime.datetime.now().isoformat(timespec="milliseconds")
+        with log_path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record) + "\n")
+    except OSError:
+        pass
+
+
 def should_block(tool_name: str, tool_input: dict) -> bool:
     if tool_name == "Bash":
         command = tool_input.get("command", "")
@@ -43,8 +54,18 @@ def main() -> None:
         sys.exit(0)
     tool_name = payload.get("tool_name", "")
     tool_input = payload.get("tool_input", {})
+    command = tool_input.get("command", "") if tool_name == "Bash" else ""
     if not should_block(tool_name, tool_input):
+        record: dict = {"event": "hook", "tool": tool_name, "decision": "pass",
+                        "pass_reason": "no nav pattern"}
+        if command:
+            record["cmd_snippet"] = command[:80]
+        _log(cwd, record)
         sys.exit(0)
+    record = {"event": "hook", "tool": tool_name, "decision": "block"}
+    if command:
+        record["cmd_snippet"] = command[:80]
+    _log(cwd, record)
     print(json.dumps({"decision": "block", "reason": BLOCK_REASON}))
     sys.exit(0)
 
