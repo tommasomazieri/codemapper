@@ -121,4 +121,65 @@ def annotate(root: Path) -> tuple[Path, dict]:
 
     out = root / "graphify-out" / "graph_annotated.json"
     out.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    _write_graph_report(root, nodes)
     return out, dict(counts)
+
+
+def _write_graph_report(root: Path, nodes: list[dict]) -> None:
+    """Write graphify-out/GRAPH_REPORT.md — a human-readable overview for the model."""
+    by_degree = sorted(nodes, key=lambda n: n.get("degree", 0), reverse=True)
+    top_nodes = by_degree[:15]
+
+    communities: dict[str, list[dict]] = defaultdict(list)
+    for n in nodes:
+        cid = str(n.get("community", "none"))
+        communities[cid].append(n)
+
+    stale_nodes = [n for n in nodes if n.get("codemapper", {}).get("stale_docstring")][:5]
+    complex_nodes = sorted(
+        [n for n in nodes if n.get("codemapper", {}).get("complexity")],
+        key=lambda n: n["codemapper"].get("complexity", 0),
+        reverse=True,
+    )[:5]
+    dead_count = sum(1 for n in nodes if n.get("codemapper", {}).get("dead") or n.get("codemapper", {}).get("dead_file"))
+
+    lines = ["# Codebase Knowledge Graph Report", ""]
+
+    lines += ["## God Nodes (most architecturally central files)", ""]
+    lines += ["| label | source_file | degree | complexity | stale | dead |", "|---|---|---|---|---|---|"]
+    for n in top_nodes:
+        cm = n.get("codemapper", {})
+        lines.append(
+            f"| {n.get('label', '')} | {n.get('source_file', '')} | {n.get('degree', 0)} "
+            f"| {cm.get('complexity', '')} | {cm.get('stale_docstring', '')} | {cm.get('dead', '') or cm.get('dead_file', '')} |"
+        )
+    lines.append("")
+
+    lines += ["## Communities", ""]
+    for cid, members in sorted(communities.items(), key=lambda x: -len(x[1]))[:10]:
+        rep = max(members, key=lambda n: n.get("degree", 0))
+        lines.append(f"- Community **{cid}**: {len(members)} nodes — representative: `{rep.get('label', '')}` ({rep.get('source_file', '')})")
+    lines.append("")
+
+    lines += ["## Quality Signals", ""]
+    lines.append(f"Dead code / dead files: **{dead_count}** nodes flagged")
+    if stale_nodes:
+        lines.append("Top stale docstrings: " + ", ".join(f"`{n.get('label')}`" for n in stale_nodes))
+    if complex_nodes:
+        lines.append("Top complexity: " + ", ".join(
+            f"`{n.get('label')}` ({n['codemapper']['complexity']})" for n in complex_nodes
+        ))
+    lines.append("")
+
+    if top_nodes:
+        a, b = top_nodes[0], top_nodes[1] if len(top_nodes) > 1 else top_nodes[0]
+        lines += [
+            "## Suggested queries",
+            f'- `explore("{a.get("label", "")} architecture")`',
+            f'- `explore("how does {a.get("label", "")} relate to {b.get("label", "")}")`',
+            f'- `god_nodes(stale_only=True)` — files with outdated docstrings',
+            f'- `god_nodes(dead_only=True)` — dead-code candidates',
+        ]
+
+    report_path = root / "graphify-out" / "GRAPH_REPORT.md"
+    report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")

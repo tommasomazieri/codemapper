@@ -38,46 +38,6 @@ def _write_mcp_json(project: Path) -> None:
     path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
-def _write_hook(project: Path) -> None:
-    """Install the PreToolUse hook in the project's .claude/settings.json.
-
-    Exec form (command + args) avoids shell-quoting issues with the spaced venv
-    python path. Idempotent: removes any prior codemapper2 hook before adding.
-    """
-    settings_dir = project / ".claude"
-    settings_dir.mkdir(parents=True, exist_ok=True)
-    path = settings_dir / "settings.json"
-    data: dict = {}
-    if path.exists():
-        try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-            if not isinstance(data, dict):
-                data = {}
-        except (json.JSONDecodeError, OSError):
-            data = {}
-
-    hooks = data.setdefault("hooks", {})
-    pre = hooks.setdefault("PreToolUse", [])
-    # Drop any existing codemapper2 hook entries (idempotent re-run).
-    def _is_ours(entry: dict) -> bool:
-        for h in entry.get("hooks", []):
-            if "codemapper.hook" in (h.get("args") or []):
-                return True
-        return False
-    pre[:] = [e for e in pre if not _is_ours(e)]
-    pre.append({
-        "matcher": "Grep|Glob|Bash",
-        "hooks": [
-            {
-                "type": "command",
-                "command": sys.executable,
-                "args": ["-m", "codemapper.hook"],
-                "timeout": 5000,
-            }
-        ],
-    })
-    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
-
 
 @app.command()
 def setup(
@@ -94,8 +54,6 @@ def setup(
     console.print(f"[cyan]Initializing codemapper2 for[/cyan] {project}")
     _write_mcp_json(project)
     console.print("  [green]OK[/green] .mcp.json -registered codemapper2 MCP server")
-    _write_hook(project)
-    console.print("  [green]OK[/green] .claude/settings.json -installed PreToolUse hook")
 
     if skip_build:
         console.print("[yellow]Skipped build[/yellow] (--skip-build). Run 'codemapper2 build' later.")
