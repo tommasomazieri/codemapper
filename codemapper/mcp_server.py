@@ -67,10 +67,12 @@ def build(no_llm: bool = True, backend: str | None = None) -> str:
         cmd.extend(["--backend", backend])
     subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     mode = "AST-only" if no_llm else "full LLM"
+    terminal_cmd = " ".join(f'"{c}"' if " " in c else c for c in cmd)
     return json.dumps({
         "status": "started",
         "mode": mode,
-        "note": f"{mode} build running in background. Wait ~30-60s then query normally.",
+        "note": f"{mode} build running in background. Wait ~60s then query normally.",
+        "terminal_fallback": f"If MCP times out, run directly: {terminal_cmd}",
     })
 
 
