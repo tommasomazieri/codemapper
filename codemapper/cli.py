@@ -18,10 +18,12 @@ console = Console()
 
 
 def _write_hook(project: Path) -> None:
-    """Install the logging-only PreToolUse hook in .claude/settings.json.
+    """Install codemapper2 hooks in .claude/settings.json (idempotent).
 
-    Fires on Grep|Glob|Bash — logs every tool call to graphify-out/mcp_usage.jsonl
-    for observability. Never blocks. Idempotent: removes prior codemapper2 entry first.
+    PreToolUse[Grep|Glob|Bash]: blocks nav commands and redirects to MCP tools
+    with specific "for X use Y" messages. Logs every decision to mcp_usage.jsonl.
+
+    SessionStart: rebuilds the graph (AST always; LLM only if files changed).
     """
     settings_dir = project / ".claude"
     settings_dir.mkdir(parents=True, exist_ok=True)
@@ -36,25 +38,37 @@ def _write_hook(project: Path) -> None:
             data = {}
 
     hooks = data.setdefault("hooks", {})
-    pre = hooks.setdefault("PreToolUse", [])
 
-    def _is_ours(entry: dict) -> bool:
-        for h in entry.get("hooks", []):
-            if "codemapper.hook" in (h.get("args") or []):
-                return True
-        return False
-    pre[:] = [e for e in pre if not _is_ours(e)]
+    def _is_ours(entry: dict, module: str) -> bool:
+        return any(module in (h.get("args") or []) for h in entry.get("hooks", []))
+
+    # PreToolUse: blocking redirect hook
+    pre = hooks.setdefault("PreToolUse", [])
+    pre[:] = [e for e in pre if not _is_ours(e, "codemapper.hook")]
     pre.append({
         "matcher": "Grep|Glob|Bash",
-        "hooks": [
-            {
-                "type": "command",
-                "command": sys.executable,
-                "args": ["-m", "codemapper.hook"],
-                "timeout": 5000,
-            }
-        ],
+        "hooks": [{
+            "type": "command",
+            "command": sys.executable,
+            "args": ["-m", "codemapper.hook"],
+            "timeout": 5000,
+        }],
     })
+
+    # SessionStart: graph rebuild hook
+    sess = hooks.setdefault("SessionStart", [])
+    sess[:] = [e for e in sess if not _is_ours(e, "codemapper.session_start")]
+    sess.append({
+        "matcher": "startup",
+        "hooks": [{
+            "type": "command",
+            "command": sys.executable,
+            "args": ["-m", "codemapper.session_start"],
+            "timeout": 300000,
+            "statusMessage": "Refreshing codemapper2 graph…",
+        }],
+    })
+
     path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
