@@ -26,7 +26,7 @@ def main() -> None:
         subprocess.run(
             [sys.executable, "-m", "codemapper.cli", "build", str(cwd), "--no-llm"],
             capture_output=True,
-            timeout=120,
+            timeout=280,
         )
     except (subprocess.TimeoutExpired, OSError):
         pass
