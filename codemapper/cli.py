@@ -257,5 +257,57 @@ def god_nodes(
     console.print(tbl)
 
 
+@app.command()
+def gephi(
+    root: Path = typer.Option(Path("."), "--root", help="Repo root."),
+    out: Optional[Path] = typer.Option(None, "--out", help="Output .gexf path (default: graphify-out/graph.gexf)."),
+) -> None:
+    """Export the annotated graph to GEXF for Gephi.
+
+    After export: open Gephi, File > Open > select graph.gexf.
+    Layout: ForceAtlas2. Color nodes by 'community'. Size by 'importance'.
+    """
+    import networkx as nx
+
+    r = root.resolve()
+    g = GraphIndex(r)
+    try:
+        g.load()
+    except FileNotFoundError as exc:
+        console.print(f"[red]FAIL[/red] {exc}")
+        raise typer.Exit(1)
+
+    G = nx.DiGraph()
+    for node in g.all_nodes():
+        cm = node.codemapper or {}
+        G.add_node(
+            node.id,
+            label=node.label or node.id,
+            source_file=node.source_file or "",
+            source_location=node.source_location or "",
+            file_type=node.file_type or "",
+            community=str(node.community or ""),
+            importance=float(node.degree),
+            complexity=int(cm.get("complexity") or 0),
+            stale_docstring=bool(cm.get("stale_docstring")),
+            dead=bool(cm.get("dead") or cm.get("dead_file")),
+        )
+
+    for node in g.all_nodes():
+        for edge, neighbor in g.get_neighbors(node.id):
+            G.add_edge(node.id, neighbor.id, relation=edge.relation or "")
+
+    dest = out or (r / "graphify-out" / "graph.gexf")
+    nx.write_gexf(G, str(dest))
+    console.print(f"[green]OK[/green] {G.number_of_nodes()} nodes, {G.number_of_edges()} edges -> {dest}")
+    console.print("")
+    console.print("[bold]Gephi quick-start:[/bold]")
+    console.print("  1. File > Open > select graph.gexf")
+    console.print("  2. Layout panel > ForceAtlas2 > Run (until stable)")
+    console.print("  3. Appearance > Nodes > Color > Partition > community")
+    console.print("  4. Appearance > Nodes > Size > Ranking > importance")
+    console.print("  5. Data Laboratory tab to inspect node attributes")
+
+
 if __name__ == "__main__":
     app()
