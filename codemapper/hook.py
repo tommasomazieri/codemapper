@@ -11,11 +11,24 @@ import re
 import sys
 from pathlib import Path
 
-# Bash commands that are file navigation (not execution / git / testing)
-NAV_PATTERNS = re.compile(
-    r'\b(grep|rg|find|cat|head|tail|sed|awk|ls|dir|wc|Get-ChildItem|gci)\b',
+# Always-nav: block wherever they appear in the command
+_ALWAYS_NAV = re.compile(
+    r'\b(grep|rg|find|ls|dir|wc|Get-ChildItem|gci)\b',
     re.IGNORECASE,
 )
+
+# Primary-nav: only block when used as a primary command, not as a pipe destination
+# e.g. `head file.py` → block; `pytest ... | head -60` → pass
+_PRIMARY_NAV = re.compile(r'\b(cat|head|tail|sed|awk)\b', re.IGNORECASE)
+
+
+def _is_primary_nav(command: str) -> bool:
+    for m in _PRIMARY_NAV.finditer(command):
+        prefix = command[:m.start()].rstrip()
+        if prefix and prefix[-1] == '|':
+            continue  # pipe destination — output filter, not file navigation
+        return True
+    return False
 
 
 def _log(cwd: Path, record: dict) -> None:
@@ -80,7 +93,8 @@ def should_block(tool_name: str, tool_input: dict) -> bool:
     if tool_name in ("Grep", "Glob"):
         return True
     if tool_name == "Bash":
-        return bool(NAV_PATTERNS.search(tool_input.get("command", "")))
+        command = tool_input.get("command", "")
+        return bool(_ALWAYS_NAV.search(command)) or _is_primary_nav(command)
     return False
 
 
