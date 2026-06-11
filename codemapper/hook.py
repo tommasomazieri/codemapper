@@ -110,7 +110,13 @@ def main() -> None:
     if command:
         record["cmd_snippet"] = command[:80]
     _log(cwd, record)
-    print(json.dumps({"decision": "block", "reason": _block_reason(tool_name, tool_input)}))
+    print(json.dumps({
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": _block_reason(tool_name, tool_input),
+        }
+    }))
     sys.exit(0)
 
 
