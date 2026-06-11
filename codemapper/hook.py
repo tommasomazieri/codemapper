@@ -89,6 +89,40 @@ def _block_reason(tool_name: str, tool_input: dict) -> str:
     return 'Use codemapper2 MCP tools: explore(), god_nodes(), neighbors(), community(), path_between(), diagnose().'
 
 
+def _extract_explicit_paths(tool_name: str, tool_input: dict) -> list:
+    """Return all explicit path arguments present in the tool call."""
+    paths = []
+    if tool_name in ("Grep", "Glob"):
+        p = tool_input.get("path")
+        if p:
+            paths.append(p)
+    elif tool_name == "Bash":
+        command = tool_input.get("command", "")
+        # Quoted Windows absolute paths
+        paths += re.findall(r'"([A-Za-z]:[\\\/][^"]*)"', command)
+        paths += re.findall(r"'([A-Za-z]:[\\\/][^']*)'", command)
+        # Unquoted Windows absolute paths
+        for m in re.finditer(r'(?<!["\'])([A-Za-z]:[\\\/]\S+)', command):
+            candidate = m.group(1).rstrip("'\"")
+            if candidate not in paths:
+                paths.append(candidate)
+    return paths
+
+
+def _all_outside_cwd(paths: list, cwd: Path) -> bool:
+    """Return True only when paths is non-empty and every path resolves outside cwd."""
+    if not paths:
+        return False
+    cwd_str = str(cwd.resolve()).lower()
+    for p in paths:
+        try:
+            if str(Path(p).resolve()).lower().startswith(cwd_str):
+                return False
+        except Exception:
+            return False  # can't resolve → assume inside
+    return True
+
+
 def should_block(tool_name: str, tool_input: dict) -> bool:
     if tool_name in ("Grep", "Glob"):
         return True
@@ -111,6 +145,13 @@ def main() -> None:
     tool_name = payload.get("tool_name", "")
     tool_input = payload.get("tool_input", {})
     command = tool_input.get("command", "") if tool_name == "Bash" else ""
+
+    # Pass through if every explicit path target is outside this project tree.
+    explicit_paths = _extract_explicit_paths(tool_name, tool_input)
+    if _all_outside_cwd(explicit_paths, cwd):
+        _log(cwd, {"event": "hook", "tool": tool_name, "decision": "pass",
+                   "pass_reason": "target outside project"})
+        sys.exit(0)
 
     if not should_block(tool_name, tool_input):
         record: dict = {"event": "hook", "tool": tool_name, "decision": "pass",
