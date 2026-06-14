@@ -7,3 +7,7 @@ build/
 .pytest_cache/
 .claude/
 .codemapper_cache.json
+
+# secrets — never commit
+api_config.json
+api_config.json.bak
