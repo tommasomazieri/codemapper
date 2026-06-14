@@ -53,7 +53,14 @@ private keys. Code-only repos can build fully offline with `--no-llm`.
 ## MCP tools
 
 `build`, `god_nodes` (filterable by complexity/staleness/dead), `explore(query)`,
-`community`, `neighbors`, `path_between`, `diagnose`, `python_sig`.
+`community`, `neighbors`, `path_between`, `diagnose(path?, scope?, language?)`, `python_sig`.
+
+`diagnose` is multi-language: Python (in-process AST), JS/TS (the `fallow` binary
+via `fallow_runner.py`, normalized by `analysis/fallow_adapter.py`), HTML
+(`analysis/html.py`, tree-sitter). `scope` is a cross-language category set
+(`dead`, `complexity`, `deps`, `staleness`, `dupes`, `circular`, `security`, `html`);
+`language` restricts to one of `python|javascript|typescript|html`. Findings carry a
+`language` tag and `summary.by_language`. See `analysis/__init__.py:CATEGORY_ENGINES`.
 
 ## Setup on a target repo
 
@@ -73,9 +80,16 @@ hook into `.claude/settings.json`, and builds the annotated graph. Idempotent.
 ## Status
 
 Phase 1 (core restructure) + Phase 2 (annotator, graph schema) + Python depth +
-servers + setup wiring are done and validated against `../geneticmon`. Deferred:
-adapting `deadcode.py`/`deps.py` to traverse graph edges for multi-language
-diagnostics (the Python AST analyzers already work and annotate correctly).
+servers + setup wiring are done and validated against `../geneticmon`.
+Multi-language diagnostics added: JS/TS via the `fallow` subprocess
+(`fallow_runner.py` + `analysis/fallow_adapter.py`), HTML via tree-sitter
+(`analysis/html.py`); language dispatch + scoring live in `analysis/__init__.py`,
+exposed through the unified `diagnose` (MCP) / `/diagnose` (API) with a `language`
+filter, and joined onto graph nodes by `annotator.py`. fallow is an external binary
+(`npm i -D fallow` / `cargo install fallow-cli`); HTML needs the `multilang` extra
+(`pip install -e .[multilang]`). Both degrade gracefully when absent.
+The end-user `code-doctor` CLI is regenerated from the API via printing-press — do
+not hand-edit `cli.py`.
 
 ## Code navigation rule
 

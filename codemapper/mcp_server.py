@@ -178,31 +178,36 @@ def neighbors(node_id: str, relation: str | None = None) -> str:
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
-def diagnose(path: str | None = None, scope: str | None = None) -> str:
-    """Deterministic quality report for a file (or the whole repo): dead code,
-    cyclomatic complexity, dependency hygiene, and docstring staleness. Every
-    finding is traceable to a line. Runs in-process; no server required.
+def diagnose(path: str | None = None, scope: str | None = None, language: str | None = None) -> str:
+    """Deterministic, multi-language quality report for a file or the whole repo.
+    Every finding is traceable to a line and tagged with its language. Runs
+    in-process (Python + HTML); JS/TS findings come from the fallow binary if
+    installed. No server required.
+
+    Languages: python (AST), javascript/typescript (fallow), html (tree-sitter).
+
+    Categories (scope): dead, complexity, deps, staleness (python only),
+    dupes, circular, security (js/ts via fallow), html (html only). Default: all.
 
     Args:
         path: Restrict findings to files matching this path fragment.
-        scope: Comma-separated analyzers (dead,complexity,deps); default all.
+        scope: Comma-separated categories (e.g. "dead,complexity"); default all.
+        language: Restrict to one language: python|javascript|typescript|html.
     """
-    from codemapper.analysis import ANALYZERS, analyze
-    from codemapper.index import CodeIndex
+    from codemapper.analysis import analyze
 
     root = _root()
-    _log_mcp(root, "diagnose", path=path, scope=scope)
-    index = CodeIndex(root)
-    index.build()
-    scope_list = [s.strip() for s in scope.split(",")] if scope else list(ANALYZERS)
-    result = analyze(index, root, scope=scope_list)
+    _log_mcp(root, "diagnose", path=path, scope=scope, language=language)
+    scope_list = [s.strip() for s in scope.split(",")] if scope else None
+    result = analyze(None, root, scope=scope_list, language=language)
     findings = [f for f in result.findings if not path or (f.path and path in f.path)]
     return json.dumps({
         "score": result.score,
         "summary": result.summary,
         "findings": [
             {"rule": f.rule, "severity": f.severity, "path": f.path,
-             "line": f.line, "symbol": f.symbol, "message": f.message}
+             "line": f.line, "symbol": f.symbol, "language": f.language,
+             "message": f.message}
             for f in findings
         ],
     }, indent=2)

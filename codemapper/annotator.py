@@ -82,11 +82,15 @@ def annotate(root: Path) -> tuple[Path, dict]:
 
     counts: dict[str, int] = defaultdict(int)
 
+    def _tag_lang(n: dict | None, lang: str | None) -> None:
+        if n is not None and lang:
+            n["codemapper"].setdefault("language", lang)
+
     for f in result.findings:
         if f.rule == "high_complexity":
             n = symbol_node(f.path, f.symbol, f.line) or file_node(f.path)
             if n is not None:
-                cyc = (f.metadata or {}).get("cyclomatic", 0)
+                cyc = (f.metadata or {}).get("cyclomatic") or 0
                 cm = n["codemapper"]
                 cm["complexity"] = max(cm.get("complexity", 0), cyc)
                 counts["complexity"] += 1
@@ -100,16 +104,41 @@ def annotate(root: Path) -> tuple[Path, dict]:
             if n is not None:
                 n["codemapper"]["dead_file"] = True
                 counts["dead_file"] += 1
-        elif f.rule == "unused_import":
+        elif f.rule in ("unused_import", "unused_dependency"):
             n = file_node(f.path)
             if n is not None:
                 n["codemapper"].setdefault("dep_issues", []).append(f"unused: {f.symbol}")
-                counts["unused_import"] += 1
+                counts[f.rule] += 1
         elif f.rule == "undeclared_dependency":
             n = file_node(f.path)
             if n is not None:
                 n["codemapper"].setdefault("dep_issues", []).append(f"undeclared: {f.symbol}")
                 counts["undeclared_dependency"] += 1
+        # --- js/ts (fallow) ---
+        elif f.rule == "duplicate_code":
+            n = symbol_node(f.path, f.symbol, f.line) or file_node(f.path)
+            if n is not None:
+                n["codemapper"]["duplicate"] = True
+                counts["duplicate"] += 1
+        elif f.rule == "circular_dependency":
+            n = file_node(f.path)
+            if n is not None:
+                n["codemapper"]["circular"] = True
+                counts["circular"] += 1
+        elif f.rule == "security":
+            n = symbol_node(f.path, f.symbol, f.line) or file_node(f.path)
+            if n is not None:
+                n["codemapper"].setdefault("security", []).append(f.message)
+                counts["security"] += 1
+        # --- html (tree-sitter) ---
+        elif f.rule in ("duplicate_id", "broken_local_ref", "missing_alt", "missing_lang", "inline_script_loc"):
+            n = file_node(f.path)
+            if n is not None:
+                n["codemapper"].setdefault("html_issues", []).append(f"{f.rule}: {f.message}")
+                counts[f.rule] += 1
+        else:
+            n = None
+        _tag_lang(n, f.language)
 
     for s in stale:
         if not s.stale:

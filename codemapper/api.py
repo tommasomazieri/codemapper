@@ -12,7 +12,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 
-from codemapper.analysis import ANALYZERS, analyze
+from codemapper.analysis import analyze
 from codemapper.graph_index import GraphIndex
 from codemapper.graphify_runner import path_query, query
 from codemapper.index import CodeIndex
@@ -81,16 +81,30 @@ def _node_dict(node) -> dict:
 # Graph navigation endpoints
 # ---------------------------------------------------------------------------
 
+def _engines(root: Path) -> dict:
+    """Which diagnostic engines are available in this environment."""
+    from codemapper import fallow_runner
+    try:
+        import tree_sitter  # noqa: F401
+        import tree_sitter_html  # noqa: F401
+        html_ok = True
+    except ImportError:
+        html_ok = False
+    return {"python": True, "fallow": fallow_runner.is_available(root), "html": html_ok}
+
+
 @app.get("/status")
 async def status() -> dict:
     graph: GraphIndex = app.state.graph
+    engines = _engines(app.state.root)
     if not graph._loaded:
-        return {"graph_ready": False, "root": str(app.state.root)}
+        return {"graph_ready": False, "root": str(app.state.root), "engines": engines}
     return {
         "graph_ready": True,
         "root": str(app.state.root),
         "nodes": graph.node_count(),
         "communities": graph.community_count(),
+        "engines": engines,
     }
 
 
@@ -161,11 +175,11 @@ async def find_nodes(label: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 @app.get("/diagnose")
-async def diagnose(path: str | None = None, scope: str | None = None) -> dict:
+async def diagnose(path: str | None = None, scope: str | None = None, language: str | None = None) -> dict:
     index: CodeIndex = app.state.index
     root: Path = app.state.root
-    scope_list = [s.strip() for s in scope.split(",")] if scope else list(ANALYZERS)
-    result = analyze(index, root, scope=scope_list)
+    scope_list = [s.strip() for s in scope.split(",")] if scope else None
+    result = analyze(index, root, scope=scope_list, language=language)
 
     findings_out = []
     for f in result.findings:
@@ -177,6 +191,7 @@ async def diagnose(path: str | None = None, scope: str | None = None) -> dict:
             "path": f.path,
             "line": f.line,
             "symbol": f.symbol,
+            "language": f.language,
             "message": f.message,
             "introduced": f.introduced,
             "actions": [asdict(a) for a in f.actions],
@@ -185,7 +200,8 @@ async def diagnose(path: str | None = None, scope: str | None = None) -> dict:
     return {
         "root": result.root,
         "path_filter": path,
-        "scope": scope_list,
+        "scope": result.scope,
+        "language": language,
         "score": result.score,
         "summary": result.summary,
         "findings": findings_out,

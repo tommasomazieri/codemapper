@@ -24,6 +24,12 @@ dev = [
     "httpx>=0.27",
     "watchdog>=4",
 ]
+# HTML diagnostics (analysis/html.py). JS/TS diagnostics use the external
+# `fallow` binary (npm i -D fallow / cargo install fallow-cli), not a pip dep.
+multilang = [
+    "tree-sitter>=0.21",
+    "tree-sitter-html>=0.20",
+]
 
 [project.scripts]
 codemapper2 = "codemapper.cli:app"
